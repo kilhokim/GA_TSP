@@ -1,5 +1,10 @@
+import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.io.file.FileManager;
+import kim.kilho.ga.util.PointUtils;
+
 public class Main {
 
+    /*
     // static void Input(String fileName) {  }
 
     static void Input() {  }
@@ -33,8 +38,30 @@ public class Main {
     static void GA(int selectionMethod, int crossoverMethod, int mutationMethod) {  }
 
     static void Output() {}
+    */
+
+    public static final int MAXN = 318; // Maximum value of N
+    public static final int PSIZE = 100;  // Size of the population
+
+    // Population of solutions
+    Path[] population = new Path[PSIZE];
+    // Best (found) solution, eval() updates this.
+    Path record;
+
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        FileManager fm = new FileManager();
+        try {
+            Path path = fm.read(args[0], MAXN);
+            System.out.println("Total length=" + path.getLength());
+            for (int i = 0; i < path.getLength(); i++) {
+                System.out.println(path.get(i).toString());
+            }
+            System.out.println("Total available time=" + path.getAvailableTime());
+        } catch (Exception e) {
+            e.getMessage();
+        }
+
     }
 }
+

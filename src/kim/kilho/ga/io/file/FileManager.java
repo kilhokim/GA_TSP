@@ -1,6 +1,9 @@
 package kim.kilho.ga.io.file;
 
 import kim.kilho.ga.exception.InvalidInputException;
+import kim.kilho.ga.exception.PathException;
+import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.gene.Point;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,44 +18,64 @@ import java.text.NumberFormat;
  * @author Kilho Kim
  */
 public class FileManager {
-  private int numPoints;
+
+  public FileManager() {
+    // Do nothing.
+  }
 
   /**
    * Receive input from file.
    * @param fileName
-   * @return FIXME: File
+   * @return Path
+   * @throws IOException
+   * @throws InvalidInputException
+   * @throws PathException
    */
-  public File read(String fileName)
-          throws IOException, InvalidInputException {
+  public Path read(String fileName, int maxN)
+          throws IOException, InvalidInputException, PathException {
+    int numPoints;
+    double availableTime;
     int i;  // iteration variable
     String[] coordinates;  // save line which is read during iteration as coordinates
     BufferedReader bis = null;
+    Path path;
 
     // Generate a new file reader
     // throw IOException for the following line:
     bis = new BufferedReader(new FileReader(fileName));
 
-    // throw NumberFormatException for the following line:
+    // Get the total number of points from the first line,
     try {
+      // catch & throw NumberFormatException for the following line:
       numPoints = Integer.parseInt(bis.readLine());
     } catch (NumberFormatException e) {
       throw new InvalidInputException("Invalid input for the number of points.");
     }
-
-    for (i = 0; i < numPoints; i++) {
-      coordinates = bis.readLine().split(" ");
-      if (coordinates.length != 2)
-        throw new InvalidInputException("Invalid input for point coordinates");
-
-
+    if (numPoints < 1 || numPoints > maxN) {
+      throw new InvalidInputException("Invalid input for the number of points.");
     }
 
+    // Get every point from each lines and add it to path,
+    path = new Path(numPoints);
+    for (i = 0; i < numPoints; i++) {
+      coordinates = bis.readLine().split(" ");
+      // if coordinates' dimension isn't two, throw InvalidInputException.
+      if (coordinates.length != 2)
+        throw new InvalidInputException("Invalid input for point coordinates");
+      path.add(new Point(Double.parseDouble(coordinates[0]),
+                         Double.parseDouble(coordinates[1])));
+    }
 
+    // Get the total available time from the last line,
+    try {
+      // catch & throw NumberFormatException for the following line:
+      availableTime = Double.parseDouble(bis.readLine());
+    } catch (NumberFormatException e) {
+      throw new InvalidInputException("Invalid input for the available time.");
+    }
+    path.setAvailableTime(availableTime);
 
-
-
-
-    return null;
+    return path;
   }
 
   /**
@@ -60,9 +83,7 @@ public class FileManager {
    * @param fileName
    */
   public void write(String fileName) {
-
+    // TODO: Complete implementing write method
   }
-
-
 
 }
