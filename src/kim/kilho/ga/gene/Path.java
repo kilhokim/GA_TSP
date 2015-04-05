@@ -24,7 +24,7 @@ public class Path {
       path[i] = i;
     shufflePath(path);
     // Initialize fitness as the maximum value.
-    fitness = Double.MAX_VALUE;
+    fitness = 1e100;
   }
 
   // Shuffling method for path array.
@@ -74,6 +74,16 @@ public class Path {
     }
 
     return fitness;
+  }
+
+  // String representation of the path.
+  public String toString() {
+    StringBuilder output = new StringBuilder();
+    for (int i = 0; i < path.length; i++) {
+      output.append(path[i]);
+      output.append(" ");
+    }
+    return output.toString();
   }
 
 }

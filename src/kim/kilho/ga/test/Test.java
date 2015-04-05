@@ -1,5 +1,6 @@
 package kim.kilho.ga.test;
 
+import kim.kilho.ga.algorithm.Selection;
 import kim.kilho.ga.exception.InvalidInputException;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.Point;
@@ -16,8 +17,6 @@ import java.util.Random;
  */
 public class Test {
 
-  // How to run:
-  // $ java Test data/cycle.in
   public static final int MAXN = 318; // Maximum value of N
   public static final int PSIZE = 100;  // Size of the population
   // Population of solutions.
@@ -31,6 +30,9 @@ public class Test {
   // Time limit for the test case
   static double timeLimit;
 
+
+  // How to run:
+  // $ java Test data/cycle.in
   public static void main(String[] args) {
 
     init(args);
@@ -64,18 +66,25 @@ public class Test {
   private static void GA() {
     long begin = System.nanoTime();
 
-    for (int i = 0; i < population.length; i++)
+    for (int i = 0; i < population.length; i++) {
       population[i] = new Path(MAXN);
+      System.out.println("------------ Path #" + i + " -----------------");
+      System.out.println(population[i].toString());
+    }
 
-    while (true) {
-      if (System.nanoTime() - begin >= timeLimit - 1) break;    // end condition
-      // for i = 1 to k
-      // Select two paths p1 and p2 from population
-      Path p1 = selection();
-      Path p2 = selection();
-      Path offspring = crossover(p1, p2);
-      offspring = mutation(offspring);
-      Path[] offsprings = null; // TODO: add offsprings into this path array
+    try {
+      while (true) {
+        if (System.nanoTime() - begin >= timeLimit - 1) break;    // end condition
+        // for i = 1 to k
+        // Select two paths p1 and p2 from population
+          Path p1 = selection(1);
+          Path p2 = selection(1);
+          Path offspring = crossover(p1, p2);
+          offspring = mutation(offspring);
+          Path[] offsprings = null; // TODO: add offsprings into this path array
+      }
+    } catch (Exception e) {
+      e.getMessage();
     }
   }
 
@@ -86,10 +95,25 @@ public class Test {
    * Currently this operator randomly chooses one with uniform distribution.
    * @return Path
    */
-  private static Path selection() {
-    // FIXME:
+  private static Path selection(int option) throws Exception {
+    switch(option) {
+      // 1. Roulette Wheel Selection.
+      case 1:
+        return Selection.RouletteWheelSelection(population);
+      case 2:
+        return Selection.TournamentSelection(population, 0.9);
+      default:
+        throw new Exception("Invalid option input");
+
+
+    }
+
+
+
+    /*
     Random rnd = new Random();
     return population[rnd.nextInt(population.length)];
+    */
   }
 
   private static Path crossover(Path p1, Path p2) {
