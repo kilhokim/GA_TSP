@@ -6,16 +6,22 @@ package kim.kilho.ga.gene;
  */
 public interface Chromosome {
 
-  // Get the length of chromosome.
+  // Get the length of the chromosome.
   int getLength();
 
-  // Get the idx'th gene in chromosome.
-  Gene get(int idx);
+  // Set the fitness value.
+  void setFitness(double f);
 
-  // Set the idx'th gene in chromosome. If it already exists, replace it.
-  void set(Gene gene, int idx);
+  // Get the fitness value.
+  double getFitness();
 
-  // Replace the original chromosome with the new chromosome made of n offspring.
-  void replace(Chromosome offspring, int n);
+    // Get the idx'th gene index in the chromosome.
+  int get(int idx);
+
+  // Set the idx'th gene in the chromosome. If it already exists, replace it.
+  void set(int g, int idx);
+
+  // Calculate the fitness of the chromosome.
+  double evaluate(Gene[] genes);
 
 }

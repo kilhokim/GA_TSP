@@ -1,4 +1,5 @@
 import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
 import kim.kilho.ga.util.PointUtils;
 
@@ -52,12 +53,14 @@ public class Main {
     public static void main(String[] args) {
         FileManager fm = new FileManager();
         try {
-            Path path = fm.read(args[0], MAXN);
-            System.out.println("Total length=" + path.getLength());
-            for (int i = 0; i < path.getLength(); i++) {
-                System.out.println(path.get(i).toString());
+            Object[] input = fm.read(args[0], MAXN);
+            Point[] points = (Point[])input[0];
+            double availableTime = (Double)input[1];
+            System.out.println("Total number of points=" + points.length);
+            for (int i = 0; i < points.length; i++) {
+                System.out.println(points[i].toString());
             }
-            System.out.println("Total available time=" + path.getAvailableTime());
+            System.out.println("Total available time=" + availableTime);
         } catch (Exception e) {
             e.getMessage();
         }

@@ -31,14 +31,15 @@ public class FileManager {
    * @throws InvalidInputException
    * @throws PathException
    */
-  public Path read(String fileName, int maxN)
+  public Object[] read(String fileName, int maxN)
           throws IOException, InvalidInputException, PathException {
     int numPoints;
     double availableTime;
     int i;  // iteration variable
     String[] coordinates;  // save line which is read during iteration as coordinates
     BufferedReader bis = null;
-    Path path;
+    Point[] points;
+    Object[] output = new Object[2];
 
     // Generate a new file reader
     // throw IOException for the following line:
@@ -56,14 +57,14 @@ public class FileManager {
     }
 
     // Get every point from each lines and add it to path,
-    path = new Path(numPoints);
+    points = new Point[numPoints];
     for (i = 0; i < numPoints; i++) {
       coordinates = bis.readLine().split(" ");
       // if coordinates' dimension isn't two, throw InvalidInputException.
       if (coordinates.length != 2)
         throw new InvalidInputException("Invalid input for point coordinates");
-      path.add(new Point(Double.parseDouble(coordinates[0]),
-                         Double.parseDouble(coordinates[1])));
+      points[i] = new Point(Double.parseDouble(coordinates[0]),
+                         Double.parseDouble(coordinates[1]));
     }
 
     // Get the total available time from the last line,
@@ -73,9 +74,11 @@ public class FileManager {
     } catch (NumberFormatException e) {
       throw new InvalidInputException("Invalid input for the available time.");
     }
-    path.setAvailableTime(availableTime);
 
-    return path;
+    output[0] = points;
+    output[1] = availableTime;
+
+    return output;
   }
 
   /**
