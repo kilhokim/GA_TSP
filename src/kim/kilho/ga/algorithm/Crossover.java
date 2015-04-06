@@ -1,6 +1,9 @@
 package kim.kilho.ga.algorithm;
 
+import kim.kilho.ga.exception.CrossoverException;
 import kim.kilho.ga.gene.Path;
+
+import java.util.Random;
 
 /**
  * Crossover algorithms for GA.
@@ -15,7 +18,20 @@ public class Crossover {
    * @return Path
    */
   public static Path onePointCrossover(Path p1, Path p2) {
-    return null;
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p1.getLength(), false);
+    int[] newPath = new int[p1.getLength()];
+    int i;
+    Random rnd = new Random();
+    // There can exist n-1 operators for length-n chromosomes(0, 1, ..., n-2)
+    int cutPoint = rnd.nextInt(p1.getLength()-1);
+    for (i = 0; i <= cutPoint; i++)
+      newPath[i] = p1.getPath()[i];
+    for (i = cutPoint+1; i < newPath.length; i++)
+      newPath[i] = p2.getPath()[i];
+    offspring.setPath(newPath);
+
+    return offspring;
   }
 
   /**
@@ -24,7 +40,20 @@ public class Crossover {
    * @param p2
    * @return Path
    */
-  public static Path multiPointCrossover(Path p1, Path p2) {
+  public static Path multiPointCrossover(Path p1, Path p2, int k) {
+    if (k > p1.getLength()-1)
+      throw new CrossoverException("Invalid number of cut points.");
+
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p1.getLength(), false);
+    int[] newPath = new int[p1.getLength()];
+    int i;
+    boolean currOnP1;
+    Random rnd = new Random();
+
+
+
+
     return null;
   }
 

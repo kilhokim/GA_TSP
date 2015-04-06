@@ -2,6 +2,7 @@ package kim.kilho.ga.algorithm;
 
 import kim.kilho.ga.exception.SelectionException;
 import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.util.ArrayUtils;
 
 import java.util.Random;
 
@@ -79,14 +80,8 @@ public class Selection {
     // The number of candidates for the tournament.
     int numCandidates = (int)Math.pow(2, k-1);
     // Indices randomly picked up in [0, population.length)
-    int[] idxs = new int[population.length];
-    // Assign 0 through population.length and shuffle the idxs array.
-    for (i = 0; i < population.length; i++)
-      idxs[i] = i;
-    for (i = 0; i < population.length; i++) {
-      int idx = i + rnd.nextInt(population.length-i);
-      int tmp = idxs[idx]; idxs[idx] = idxs[i]; idxs[i] = tmp;
-    }
+    int[] idxs = ArrayUtils.genRandomIntegers(0, population.length);
+
     // DEBUG:
     // System.out.print("idxs= ");
     // for (i = 0; i < numCandidates; i++)

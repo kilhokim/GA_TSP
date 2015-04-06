@@ -1,6 +1,7 @@
 package kim.kilho.ga.gene;
 
 import kim.kilho.ga.exception.PathException;
+import kim.kilho.ga.util.ArrayUtils;
 import kim.kilho.ga.util.PointUtils;
 
 import java.util.Random;
@@ -15,25 +16,17 @@ public class Path {
   private int length;  // the total length of path sequence
   private double fitness; // fitness for the path
 
-
-  public Path(int maxLength) {
-    path = new int[maxLength];
+  public Path(int maxLength, boolean randomGeneration) {
     length = maxLength;
-    // Generate a random order-based path.
-    for (int i = 0; i < maxLength; i++)
-      path[i] = i;
-    shufflePath(path);
+
+    // Initialize path as a random order-based path
+    // if randomGeneration is checked true.
+    if (randomGeneration) {
+      // Generate a random order-based path.
+      path = ArrayUtils.genRandomIntegers(0, maxLength);
+    }
     // Initialize fitness as the maximum value.
     fitness = 1e100;
-  }
-
-  // Shuffling method for path array.
-  private static void shufflePath(int[] path) {
-    Random rnd = new Random();
-    for (int i = 0; i < path.length; i++) {
-      int idx = i + rnd.nextInt(path.length-i);
-      int tmp = path[idx]; path[idx] = path[i]; path[i] = tmp;  // Swap
-    }
   }
 
   public int getLength() {
