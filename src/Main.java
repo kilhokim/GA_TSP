@@ -61,13 +61,14 @@ public class Main {
     // Constants
     // Selection
     public static final int ROULETTE_WHEEL_SELECTION = 1;
-    public static final double SELECTION_PRESSURE_PARAM = 3;
-    public static final double SELECTION_TOURNAMENT_T = 0.9;
+      public static final double SELECTION_PRESSURE_PARAM = 3;
+      public static final double SELECTION_TOURNAMENT_T = 0.9;
     public static final int TOURNAMENT_SELECTION = 2;
 
     // Crossover
     public static final int ONE_POINT_CROSSOVER = 1;
     public static final int MULTI_POINT_CROSSOVER = 2;
+      public static final int NUMBER_OF_CUT_POINTS = MAXN - 1;
     public static final int UNIFORM_CROSSOVER = 3;
     public static final int CYCLE_CROSSOVER = 4;
     public static final int ORDER_CROSSOVER = 5;
@@ -171,9 +172,10 @@ public class Main {
         switch(option) {
             // 1. One-point Crossover
             case 1:
-                return Crossover.onePointCrossover(p1, p2);
+                return Crossover.multiPointCrossover(p1, p2, 1);
             case 2:
-                return Crossover.multiPointCrossover(p1, p2, 4);
+                return Crossover.multiPointCrossover(p1, p2,
+                        NUMBER_OF_CUT_POINTS);
             case 3:
                 return Crossover.uniformCrossover(p1, p2);
             case 4:

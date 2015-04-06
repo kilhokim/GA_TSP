@@ -2,7 +2,9 @@ package kim.kilho.ga.algorithm;
 
 import kim.kilho.ga.exception.CrossoverException;
 import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.util.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -12,49 +14,44 @@ import java.util.Random;
 public class Crossover {
 
   /**
-   * One-point Crossover.
+   * Multi-point Crossover,
+   * which is a generalized version of One-point Crossover.
    * @param p1
    * @param p2
    * @return Path
    */
-  public static Path onePointCrossover(Path p1, Path p2) {
-    // Generate a new offspring with empty path.
-    Path offspring = new Path(p1.getLength(), false);
-    int[] newPath = new int[p1.getLength()];
-    int i;
-    Random rnd = new Random();
-    // There can exist n-1 operators for length-n chromosomes(0, 1, ..., n-2)
-    int cutPoint = rnd.nextInt(p1.getLength()-1);
-    for (i = 0; i <= cutPoint; i++)
-      newPath[i] = p1.getPath()[i];
-    for (i = cutPoint+1; i < newPath.length; i++)
-      newPath[i] = p2.getPath()[i];
-    offspring.setPath(newPath);
-
-    return offspring;
-  }
-
-  /**
-   * Multi-point Crossover.
-   * @param p1
-   * @param p2
-   * @return Path
-   */
-  public static Path multiPointCrossover(Path p1, Path p2, int k) {
-    if (k > p1.getLength()-1)
+  public static Path multiPointCrossover(Path p1, Path p2, int numCutPoints) {
+    if (numCutPoints > p1.getLength()-1)
       throw new CrossoverException("Invalid number of cut points.");
 
     // Generate a new offspring with empty path.
     Path offspring = new Path(p1.getLength(), false);
     int[] newPath = new int[p1.getLength()];
-    int i;
-    boolean currOnP1;
-    Random rnd = new Random();
+    int i, j = 0;
 
+    int[] cutPointIdxCandidates = ArrayUtils.genRandomIntegers(0, p1.getLength()-1);
+    int[] cutPointIdxs = new int[numCutPoints];
+    for (i = 0; i < numCutPoints; i++)
+      cutPointIdxs[i] = cutPointIdxCandidates[i];
+    // Sort the cutPointIdxs array in ascending order.
+    Arrays.sort(cutPointIdxs);
 
+    boolean currOnP1 = true;  // Get points from p1 at the starting point.
+    for (i = 0; i < p1.getLength(); i++) {
+      if (currOnP1)
+        newPath[i] = p1.getPath()[i];
+      else
+        newPath[i] = p2.getPath()[i];
+      // If the current point is one of the cutting point indices in cutPointIdxs,
+      // switch on/off the currOnP1 value and increase j.
+      if (j < cutPointIdxs.length && i == cutPointIdxs[j]) {
+        currOnP1 = !currOnP1; j++;
+      }
+    }
 
+    offspring.setPath(newPath);
 
-    return null;
+    return offspring;
   }
 
   /**
