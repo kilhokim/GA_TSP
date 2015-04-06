@@ -32,6 +32,10 @@ public class Test {
 
   // Constants
   public static final int ROULETTE_WHEEL_SELECTION = 1;
+    public static final double SELECTION_PRESSURE_PARAM = 3;
+    public static final double SELECTION_TOURNAMENT_T = 0.9;
+
+
   public static final int TOURNAMENT_SELECTION = 2;
 
 
@@ -82,11 +86,10 @@ public class Test {
           System.out.println("break!");
           // break;    // end condition
         }
-        // for i = 1 to k
         // Select two paths p1 and p2 from population
-        Path p1 = selection(TOURNAMENT_SELECTION);
+        Path p1 = selection(ROULETTE_WHEEL_SELECTION);
         System.out.println("p1: " + p1.toString());
-        Path p2 = selection(TOURNAMENT_SELECTION);
+        Path p2 = selection(ROULETTE_WHEEL_SELECTION);
         System.out.println("p2: " + p2.toString());
         // Path offspring = crossover(p1, p2);
         // offspring = mutation(offspring);
@@ -108,9 +111,11 @@ public class Test {
     switch(option) {
       // 1. Roulette Wheel Selection.
       case 1:
-        return Selection.rouletteWheelSelection(population);
+        return Selection.rouletteWheelSelection(population,
+                                        SELECTION_PRESSURE_PARAM);
       case 2:
-        return Selection.tournamentSelection(population, 0.9);
+        return Selection.tournamentSelection(population,
+                                        SELECTION_TOURNAMENT_T);
       default:
         throw new Exception("Invalid option input");
     }

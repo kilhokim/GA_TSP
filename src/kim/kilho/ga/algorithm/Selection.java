@@ -16,18 +16,49 @@ public class Selection {
    * @param population
    * @return Path
    */
-  public static Path rouletteWheelSelection(Path[] population) {
+  public static Path rouletteWheelSelection(Path[] population, double selectionPressureParam) {
     double sumOfFitness = 0, sum = 0;
+    double minCost = Double.MAX_VALUE, maxCost = 0, currCost;
+    // Fitness values used in Selection
+    // for each solution in the original population.
+    double[] selectionFitness = new double[population.length];
     Random rnd = new Random();
-    for (int i = 0; i < population.length; i++) {
-      sumOfFitness += population[i].getFitness();
+    int i;
+
+    // Pick up the maximum and the minimum fitness value.
+    for (i = 0; i < population.length; i++) {
+      currCost = population[i].getFitness();
+      if (currCost > maxCost)
+        maxCost = currCost;
+      else if (currCost < minCost)
+        minCost = currCost;
+    }
+    // Calculate the Selection fitness values for each solution.
+    for (i = 0; i < population.length; i++) {
+      currCost = population[i].getFitness();
+      selectionFitness[i] = (maxCost - currCost)
+              + (maxCost - minCost)/(selectionPressureParam-1);
+    }
+
+    // DEBUG
+    // System.out.print("selectionFitness= ");
+    // for (i = 0; i < selectionFitness.length; i++) {
+    //  System.out.print(selectionFitness[i] + " ");
+    // }
+    // System.out.println("");
+
+    // TODO: Rank-based Selection
+    // TODO: Sharing
+
+    for (i = 0; i < population.length; i++) {
+      sumOfFitness += selectionFitness[i];
       // System.out.println("#" + i + " sumOfFitness=" + sumOfFitness);
     }
     double point = rnd.nextDouble() * sumOfFitness;
     // System.out.println("point=" + point);
 
-    for (int i = 0; i < population.length; i++) {
-      sum += population[i].getFitness();
+    for (i = 0; i < population.length; i++) {
+      sum += selectionFitness[i];
       // System.out.println("#" + i + " sum=" + sum);
       if (point < sum) return population[i];
     }
@@ -106,7 +137,5 @@ public class Selection {
     return tournament(nextRoundCandidates, t); // Run current method recursively
   }
 
-  // TODO: Rank-based Selection
-  // TODO: Sharing
 
 }
