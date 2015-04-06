@@ -30,6 +30,10 @@ public class Test {
   // Time limit for the test case
   static double timeLimit;
 
+  // Constants
+  public static final int ROULETTE_WHEEL_SELECTION = 1;
+  public static final int TOURNAMENT_SELECTION = 2;
+
 
   // How to run:
   // $ java Test data/cycle.in
@@ -64,25 +68,30 @@ public class Test {
    * A 'steady-state' GA
    */
   private static void GA() {
-    long begin = System.nanoTime();
+    long begin = System.currentTimeMillis()/1000;
 
     for (int i = 0; i < population.length; i++) {
       population[i] = new Path(MAXN);
-      System.out.println("------------ Path #" + i + " -----------------");
-      System.out.println(population[i].toString());
+      // System.out.println("------------ Path #" + i + " -----------------");
+      // System.out.println(population[i].toString());
     }
 
     try {
-      while (true) {
-        if (System.nanoTime() - begin >= timeLimit - 1) break;    // end condition
+      // while (true) {
+        if (System.currentTimeMillis()/1000 - begin >= timeLimit - 1) {
+          System.out.println("break!");
+          // break;    // end condition
+        }
         // for i = 1 to k
         // Select two paths p1 and p2 from population
-          Path p1 = selection(1);
-          Path p2 = selection(1);
-          Path offspring = crossover(p1, p2);
-          offspring = mutation(offspring);
-          Path[] offsprings = null; // TODO: add offsprings into this path array
-      }
+        Path p1 = selection(TOURNAMENT_SELECTION);
+        System.out.println("p1: " + p1.toString());
+        Path p2 = selection(TOURNAMENT_SELECTION);
+        System.out.println("p2: " + p2.toString());
+        // Path offspring = crossover(p1, p2);
+        // offspring = mutation(offspring);
+        // Path[] offsprings = null; // TODO: add offsprings into this path array
+      // }
     } catch (Exception e) {
       e.getMessage();
     }
@@ -99,13 +108,11 @@ public class Test {
     switch(option) {
       // 1. Roulette Wheel Selection.
       case 1:
-        return Selection.RouletteWheelSelection(population);
+        return Selection.rouletteWheelSelection(population);
       case 2:
-        return Selection.TournamentSelection(population, 0.9);
+        return Selection.tournamentSelection(population, 0.9);
       default:
         throw new Exception("Invalid option input");
-
-
     }
 
 
