@@ -18,12 +18,12 @@ public class Test {
   public static void crossoverTest() {
     Path p1 = new Path(10, true);
     Path p2 = new Path(10, true);
+
     System.out.println("p1: " + p1.toString());
     System.out.println("p2: " + p2.toString());
 
-    Path offspring = Crossover.multiPointCrossover(p1, p2, 9);
+    Path offspring = Crossover.cycleCrossover(p1, p2);
     System.out.println("offspring: " + offspring.toString());
-
   }
 
 

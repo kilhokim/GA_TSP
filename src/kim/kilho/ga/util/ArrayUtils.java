@@ -29,4 +29,21 @@ public final class ArrayUtils {
 
     return output;
   }
+
+  /**
+   * A simple method for finding an index of a certain value in array.
+   * FIXME: Replace this method to Arrays.asList(int[]).indexOf(int);
+   * if performance problem occurs.
+   * @param array
+   * @param value
+   * @return
+   */
+  public static int indexOf(int[] array, int value) {
+    for (int i = 0; i < array.length; i++) {
+      if (array[i] == value)
+        return i;
+    }
+
+    return -1;
+  }
 }

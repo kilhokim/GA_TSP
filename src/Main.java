@@ -68,8 +68,9 @@ public class Main {
     // Crossover
     public static final int ONE_POINT_CROSSOVER = 1;
     public static final int MULTI_POINT_CROSSOVER = 2;
-      public static final int NUMBER_OF_CUT_POINTS = MAXN - 1;
+      public static final int NUMBER_OF_CUT_POINTS = MAXN/2;
     public static final int UNIFORM_CROSSOVER = 3;
+      public static final double CROSSOVER_PROBABILITY = 0.5;
     public static final int CYCLE_CROSSOVER = 4;
     public static final int ORDER_CROSSOVER = 5;
     public static final int PARTIALLY_MATCHED_CROSSOVER = 6;
@@ -131,9 +132,9 @@ public class Main {
 //        Path p2 = selection(TOURNAMENT_SELECTION);
             System.out.println("p1: " + p1.toString());
             System.out.println("p2: " + p2.toString());
-            Path offspring = crossover(p1, p2, ONE_POINT_CROSSOVER);
+//        Path offspring = crossover(p1, p2, ONE_POINT_CROSSOVER);
 //        Path offspring = crossover(p1, p2, MULTI_POINT_CROSSOVER);
-//        Path offspring = crossover(p1, p2, UNIFORM_CROSSOVER);
+            Path offspring = crossover(p1, p2, UNIFORM_CROSSOVER);
 //        Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
 //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
@@ -177,7 +178,8 @@ public class Main {
                 return Crossover.multiPointCrossover(p1, p2,
                         NUMBER_OF_CUT_POINTS);
             case 3:
-                return Crossover.uniformCrossover(p1, p2);
+                return Crossover.uniformCrossover(p1, p2,
+                        CROSSOVER_PROBABILITY);
             case 4:
                 return Crossover.cycleCrossover(p1, p2);
             case 5:
