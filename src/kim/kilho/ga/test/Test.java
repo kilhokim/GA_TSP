@@ -31,7 +31,7 @@ public class Test {
   public static void mutationTest() {
     Path p1 = new Path(10, true);
     System.out.println("p1: " + p1.toString());
-    Path offspring = Mutation.displacementMutation(p1);
+    Path offspring = Mutation.exchangeMutation(p1);
     System.out.println("offspring: " + offspring.toString());
   }
 

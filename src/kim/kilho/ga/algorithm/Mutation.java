@@ -26,9 +26,8 @@ public class Mutation {
 
     Random rnd = new Random();
 
-    int[] randomIdxs = ArrayUtils.genRandomIntegers(0, p.getLength());
     // Randomly pick two indices as starting index and ending index of subpath
-    int[] subpathIdxs = {randomIdxs[0], randomIdxs[1]};
+    int[] subpathIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     Arrays.sort(subpathIdxs);
     System.out.println("subpath_start=" + subpathIdxs[0] + ", subpath_end=" + subpathIdxs[1]);
     // Randomly pick a index as inserting point index of subpath
@@ -52,8 +51,30 @@ public class Mutation {
     return offspring;
   }
 
+  /**
+   * Exchange Mutation.
+   * @param p
+   * @return Path
+   */
   public static Path exchangeMutation(Path p) {
-    return null;
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p.getLength(), false);
+    int[] newPath = new int[p.getLength()];
+
+    // Randomly pick two indices
+    int[] exchangeIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
+
+    for (int i = 0; i < newPath.length; i++) {
+      if (i == exchangeIdxs[0])
+        newPath[i] = p.getPath()[exchangeIdxs[1]];
+      else if (i == exchangeIdxs[1])
+        newPath[i] = p.getPath()[exchangeIdxs[0]];
+      else
+        newPath[i] = p.getPath()[i];
+      }
+
+    offspring.setPath(newPath);
+    return offspring;
   }
 
   public static Path insertionMutation(Path p) {
