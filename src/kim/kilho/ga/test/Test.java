@@ -1,6 +1,7 @@
 package kim.kilho.ga.test;
 
 import kim.kilho.ga.algorithm.Crossover;
+import kim.kilho.ga.algorithm.Mutation;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.util.ArrayUtils;
 
@@ -12,7 +13,8 @@ import java.util.Arrays;
 public class Test {
 
   public static void main(String[] args) {
-    crossoverTest();
+    // crossoverTest();
+    mutationTest();
   }
 
   public static void crossoverTest() {
@@ -23,6 +25,13 @@ public class Test {
     System.out.println("p2: " + p2.toString());
 
     Path offspring = Crossover.cycleCrossover(p1, p2);
+    System.out.println("offspring: " + offspring.toString());
+  }
+
+  public static void mutationTest() {
+    Path p1 = new Path(10, true);
+    System.out.println("p1: " + p1.toString());
+    Path offspring = Mutation.displacementMutation(p1);
     System.out.println("offspring: " + offspring.toString());
   }
 

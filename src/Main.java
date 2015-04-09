@@ -73,7 +73,7 @@ public class Main {
     public static final int EDGE_RECOMBINATION = 4;
 
     // Mutation
-    public static final int TYPICAL_MUTATION = 1;
+    public static final int DISPLACEMENT_MUTATION = 1;
 
     // How to run:
     // $ java Test data/cycle.in
@@ -129,15 +129,10 @@ public class Main {
 //        Path p2 = selection(TOURNAMENT_SELECTION);
             System.out.println("p1: " + p1.toString());
             System.out.println("p2: " + p2.toString());
-//        Path offspring = crossover(p1, p2, ONE_POINT_CROSSOVER);
-//        Path offspring = crossover(p1, p2, MULTI_POINT_CROSSOVER);
-            Path offspring = crossover(p1, p2, UNIFORM_CROSSOVER);
-//        Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
+            Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
 //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
-//        Path offspring = crossover(p1, p2, ARITHMETIC_CROSSOVER);
-//        Path offspring = crossover(p1, p2, EDGE_RECOMBINATION);
-            offspring = mutation(offspring, TYPICAL_MUTATION);
+            offspring = mutation(offspring, DISPLACEMENT_MUTATION);
             // Path[] offsprings = null; // TODO: add offsprings into this path array
             // }
         } catch (Exception e) {
@@ -180,8 +175,8 @@ public class Main {
 
     private static Path mutation(Path p, int option) throws Exception {
         switch(option) {
-            case TYPICAL_MUTATION:
-                return Mutation.typicalMutation(p);
+            case DISPLACEMENT_MUTATION:
+                return Mutation.displacementMutation(p);
             default:
                 throw new Exception("Invalid option input.");
         }
