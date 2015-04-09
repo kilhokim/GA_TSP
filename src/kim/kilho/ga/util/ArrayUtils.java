@@ -18,15 +18,16 @@ public final class ArrayUtils {
    * @return int[]
    */
   public static int[] genRandomIntegers(int start, int end) {
+    if (start > end) throw new InvalidParamException("Invalid parameter: start, end");
     int[] output = new int[end-start];
     int i;
     Random rnd = new Random();
     for (i = start; i < end; i++) {
-      output[i] = i;
+      output[i-start] = i;
     }
     for (i = start; i < end; i++) {
       int idx = i + rnd.nextInt(end-i);
-      int tmp = output[idx]; output[idx] = output[i]; output[i] = tmp;  // swap
+      int tmp = output[idx-start]; output[idx-start] = output[i-start]; output[i-start] = tmp;  // swap
     }
 
     return output;
@@ -41,6 +42,7 @@ public final class ArrayUtils {
    */
   public static int[] genRandomIntegers(int start, int end, int num)
           throws InvalidParamException {
+    if (start > end) throw new InvalidParamException("Invalid parameter: start, end");
     if (num > end-start) throw new InvalidParamException("Invalid parameter: num");
 
     int[] randomInts = new int[end-start];
@@ -48,11 +50,11 @@ public final class ArrayUtils {
     int i;
     Random rnd = new Random();
     for (i = start; i < end; i++) {
-      randomInts[i] = i;
+      randomInts[i-start] = i;
     }
     for (i = start; i < end; i++) {
       int idx = i + rnd.nextInt(end-i);
-      int tmp = randomInts[idx]; randomInts[idx] = randomInts[i]; randomInts[i] = tmp;  // swap
+      int tmp = randomInts[idx-start]; randomInts[idx-start] = randomInts[i-start]; randomInts[i-start] = tmp;  // swap
     }
 
     for (i = 0; i < num; i++)
