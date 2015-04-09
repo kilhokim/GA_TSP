@@ -1,4 +1,5 @@
 import kim.kilho.ga.algorithm.Crossover;
+import kim.kilho.ga.algorithm.Mutation;
 import kim.kilho.ga.algorithm.Selection;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.Point;
@@ -66,17 +67,13 @@ public class Main {
     public static final int TOURNAMENT_SELECTION = 2;
 
     // Crossover
-    public static final int ONE_POINT_CROSSOVER = 1;
-    public static final int MULTI_POINT_CROSSOVER = 2;
-      public static final int NUMBER_OF_CUT_POINTS = MAXN/2;
-    public static final int UNIFORM_CROSSOVER = 3;
-      public static final double CROSSOVER_PROBABILITY = 0.5;
-    public static final int CYCLE_CROSSOVER = 4;
-    public static final int ORDER_CROSSOVER = 5;
-    public static final int PARTIALLY_MATCHED_CROSSOVER = 6;
-    public static final int ARITHMETIC_CROSSOVER = 7;
-    public static final int HEURISTIC_CROSSOVER = 8;
-    public static final int EDGE_RECOMBINATION = 9;
+    public static final int CYCLE_CROSSOVER = 1;
+    public static final int ORDER_CROSSOVER = 2;
+    public static final int PARTIALLY_MATCHED_CROSSOVER = 3;
+    public static final int EDGE_RECOMBINATION = 4;
+
+    // Mutation
+    public static final int TYPICAL_MUTATION = 1;
 
     // How to run:
     // $ java Test data/cycle.in
@@ -139,9 +136,8 @@ public class Main {
 //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
 //        Path offspring = crossover(p1, p2, ARITHMETIC_CROSSOVER);
-//        Path offspring = crossover(p1, p2, HEURISTIC_CROSSOVER);
 //        Path offspring = crossover(p1, p2, EDGE_RECOMBINATION);
-            // offspring = mutation(offspring);
+            offspring = mutation(offspring, TYPICAL_MUTATION);
             // Path[] offsprings = null; // TODO: add offsprings into this path array
             // }
         } catch (Exception e) {
@@ -171,35 +167,26 @@ public class Main {
 
     private static Path crossover(Path p1, Path p2, int option) throws Exception {
         switch(option) {
-            // 1. One-point Crossover
-            case 1:
-                return Crossover.multiPointCrossover(p1, p2, 1);
-            case 2:
-                return Crossover.multiPointCrossover(p1, p2,
-                        NUMBER_OF_CUT_POINTS);
-            case 3:
-                return Crossover.uniformCrossover(p1, p2,
-                        CROSSOVER_PROBABILITY);
-            case 4:
+            case CYCLE_CROSSOVER:
                 return Crossover.cycleCrossover(p1, p2);
-            case 5:
+            case ORDER_CROSSOVER:
                 return Crossover.orderCrossover(p1, p2);
-            case 6:
+            case PARTIALLY_MATCHED_CROSSOVER:
                 return Crossover.partiallyMatchedCrossover(p1, p2);
-            case 7:
-                return Crossover.arithmeticCrossover(p1, p2);
-            case 8:
-                return Crossover.heuristicCrossover(p1, p2);
-            case 9:
+            case EDGE_RECOMBINATION:
                 return Crossover.edgeRecombination(p1, p2);
             default:
                 throw new Exception("Invalid option input.");
         }
     }
 
-    private static Path mutation(Path p) {
-        // TODO:
-        return null;
+    private static Path mutation(Path p, int option) throws Exception {
+        switch(option) {
+            case TYPICAL_MUTATION:
+                return Mutation.typicalMutation(p);
+            default:
+                throw new Exception("Invalid option input.");
+        }
     }
 
     /**
