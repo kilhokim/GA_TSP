@@ -173,8 +173,6 @@ public class Main {
                 return Crossover.orderCrossover(p1, p2);
             case PARTIALLY_MATCHED_CROSSOVER:
                 return Crossover.partiallyMatchedCrossover(p1, p2);
-            case EDGE_RECOMBINATION:
-                return Crossover.edgeRecombination(p1, p2);
             default:
                 throw new Exception("Invalid option input.");
         }

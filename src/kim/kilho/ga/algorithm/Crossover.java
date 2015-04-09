@@ -77,15 +77,4 @@ public class Crossover {
     // TODO
     return null;
   }
-
-  /**
-   * Edge Recombination.
-   * @param p1
-   * @param p2
-   * @return Path
-   */
-  public static Path edgeRecombination(Path p1, Path p2) {
-    // WARNING: Is this one kind of local optimum?
-    return null;
-  }
 }
