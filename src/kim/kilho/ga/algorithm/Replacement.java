@@ -14,10 +14,10 @@ import java.util.Random;
 public class Replacement {
 
   /**
-   * Replace the random chromosome in the population.
+   * Replace the random chromosome with the path in the population.
    * @param population
    * @param p
-   * @return Path[]
+   * @return PathPopulation
    */
   public static PathPopulation randomReplacement(PathPopulation population, Path p) {
     Random rnd = new Random();
@@ -27,15 +27,16 @@ public class Replacement {
   }
 
   /**
-   * Replacing the worst chromosome in the population.
+   * Replacing the worst chromosome with the path in the population.
    * @param population
    * @param p
-   * @return Path[]
+   * @return PathPopulation
    */
   public static PathPopulation worstCaseReplacement(PathPopulation population, Path p) {
     int worstCaseIdx = 0;
     double maxFitness = 0;
     for (int i = 0; i < population.size(); i++) {
+      // The bigger the fitness is, the worse the path is.
       if (population.get(i).getFitness() > maxFitness) {
         maxFitness = population.get(i).getFitness();
         worstCaseIdx = i;
@@ -45,8 +46,37 @@ public class Replacement {
     return population;
   }
 
-  // TODO:
-  // public static Path[] worstParentReplacement(Path[] population, )
+  /**
+   * Replacing the worse parent with the path in the population.
+   * @param population
+   * @param p
+   * @param p1
+   * @param p2
+   * @return PathPopulation
+   */
+  public static PathPopulation worstParentReplacement(PathPopulation population,
+                                                      Path p, Path p1, Path p2) {
+    int idx = 0;
+    // The bigger the fitness is, the worse the path is.
+    if (p1.getFitness() > p2.getFitness())
+      idx = p1.getIdxInPopulation();
+    else
+      idx = p2.getIdxInPopulation();
+    population.set(idx, p);
+    return population;
+  }
+
+  public static PathPopulation worstParentCaseReplacement(PathPopulation population,
+                                                          Path p, Path p1, Path p2) {
+    // The bigger the fitness is, the worse the path is.
+    // If two parents' are better than the current path, do worstCaseReplacement:
+    if (p.getFitness() > p1.getFitness() && p.getFitness() > p2.getFitness()) {
+      return worstCaseReplacement(population, p);
+    // If not, do worstParentReplacement:
+    } else {
+      return worstParentReplacement(population, p, p1, p2);
+    }
+  }
 
 
 }

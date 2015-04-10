@@ -45,6 +45,8 @@ public class Main {
     // Replacement
     public static final int RANDOM_REPLACEMENT = 1;
     public static final int WORST_CASE_REPLACEMENT = 2;
+    public static final int WORST_PARENT_REPLACEMENT = 3;
+    public static final int WORST_PARENT_CASE_REPLACEMENT = 4;
 
     // How to run:
     // $ java Test data/cycle.in
@@ -87,26 +89,36 @@ public class Main {
                 System.out.println("break!");
                 // break;    // end condition
             }
-            // Select two paths p1 and p2 from population
+
+            // 1. Select two paths p1 and p2 from the population
             Path p1 = selection(ROULETTE_WHEEL_SELECTION);
             Path p2 = selection(ROULETTE_WHEEL_SELECTION);
 //        Path p1 = selection(TOURNAMENT_SELECTION);
 //        Path p2 = selection(TOURNAMENT_SELECTION);
             System.out.println("p1: " + p1.toString());
             System.out.println("p2: " + p2.toString());
+
+            // 2. Crossover two paths to generate a new offspring
             Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
 //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+
+            // 3. Mutate the newly generated offspring
             offspring = mutation(offspring, DISPLACEMENT_MUTATION);
 //            offspring = mutation(offspring, EXCHANGE_MUTATION);
 //            offspring = mutation(offspring, INSERTION_MUTATION);
 //            offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION);
 //            offspring = mutation(offspring, INVERSION_MUTATION);
 //            offspring = mutation(offspring, SCRAMBLE_MUTATION);
+
+            // 4. Evaluate the fitness value of newly generated offspring
             offspring.evaluate(points);
+
+            // 5. Replace one of the path in population with the new offspring
             population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
-            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
-            // Path[] offsprings = null; // TODO: add offsprings into this path array
+//            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
+//            population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
+//            population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
             // }
         } catch (Exception e) {
             e.getMessage();
@@ -175,6 +187,10 @@ public class Main {
                 return Replacement.randomReplacement(population, p);
             case WORST_CASE_REPLACEMENT:
                 return Replacement.worstCaseReplacement(population, p);
+            case WORST_PARENT_REPLACEMENT:
+                return Replacement.worstParentReplacement(population, p, p1, p2);
+            case WORST_PARENT_CASE_REPLACEMENT:
+                return Replacement.worstParentCaseReplacement(population, p, p1, p2);
             default:
                 throw new Exception("Invalid option param.");
         }
