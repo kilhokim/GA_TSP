@@ -13,8 +13,8 @@ import java.util.Arrays;
 public class Test {
 
   public static void main(String[] args) {
-    // crossoverTest();
-    mutationTest();
+    crossoverTest();
+    // mutationTest();
   }
 
   public static void crossoverTest() {
@@ -24,7 +24,7 @@ public class Test {
     System.out.println("p1: " + p1.toString());
     System.out.println("p2: " + p2.toString());
 
-    Path offspring = Crossover.cycleCrossover(p1, p2);
+    Path offspring = Crossover.partiallyMatchedCrossover(p1, p2);
     System.out.println("offspring: " + offspring.toString());
   }
 

@@ -63,8 +63,40 @@ public class Crossover {
    * @return Path
    */
   public static Path orderCrossover(Path p1, Path p2) {
-    // TODO
-    return null;
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p1.getLength(), false); // idxInPopulation has not assigned yet.
+    int[] newPath = new int[p1.getLength()];
+
+    // Randomly pick two cut points
+    int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p1.getLength(), 2);
+    Arrays.sort(cutPointIdxs);
+    System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
+
+    int i, j = 0;
+    // Temporarily store the cut part.
+    int[] tmp = new int[cutPointIdxs[1]-cutPointIdxs[0]+1];
+    for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
+      tmp[i-cutPointIdxs[0]] = p1.getPath()[i];
+
+    // Put points after the right limit of the cut part.
+    for (i = cutPointIdxs[1]+1; i < p1.getLength(); i++)
+      // Put a point only if cut part doesn't contain it.
+      if (ArrayUtils.indexOf(tmp, p2.getPath()[i]) == -1)
+        newPath[j++] = p2.getPath()[i];
+
+    // Put points in the cut part in newPath.
+    for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
+      newPath[j++] = tmp[i-cutPointIdxs[0]];
+
+    // Put points before the right limit of the cut part
+    for (i = 0; i <= cutPointIdxs[1]; i++)
+      // Put a point only if cut part doesn't contain it.
+      if (ArrayUtils.indexOf(tmp, p2.getPath()[i]) == -1)
+        newPath[j++] = p2.getPath()[i];
+
+    offspring.setPath(newPath);
+
+    return offspring;
   }
 
   /**
@@ -74,7 +106,35 @@ public class Crossover {
    * @return Path
    */
   public static Path partiallyMatchedCrossover(Path p1, Path p2) {
-    // TODO
-    return null;
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p1.getLength(), false); // idxInPopulation has not assigned yet.
+    int[] newPath = new int[p1.getLength()];
+
+    // Randomly pick two cut points
+    int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p1.getLength(), 2);
+    Arrays.sort(cutPointIdxs);
+    System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
+
+    int i, k = 0;
+    // Temporarily store the cut part.
+    int[] tmp = new int[cutPointIdxs[1]-cutPointIdxs[0]+1];
+    for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
+      tmp[i-cutPointIdxs[0]] = p1.getPath()[i];
+
+    // PMX process...
+    for (i = 0; i < newPath.length; i++) {
+      if (i >= cutPointIdxs[0] && i <= cutPointIdxs[1])
+        newPath[i] = tmp[i-cutPointIdxs[0]];
+      else {
+        k = i;
+        while (ArrayUtils.indexOf(tmp, p2.getPath()[k]) != -1)
+          k = ArrayUtils.indexOf(tmp, p2.getPath()[k]) + cutPointIdxs[0];
+        newPath[i] = p2.getPath()[k];
+      }
+    }
+
+    offspring.setPath(newPath);
+
+    return offspring;
   }
 }

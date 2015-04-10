@@ -65,8 +65,8 @@ public final class ArrayUtils {
 
   /**
    * A simple method for finding an index of a certain value in array.
-   * FIXME: Replace this method to Arrays.asList(int[]).indexOf(int);
-   * if performance problem occurs.
+   * FIXME: Replace this method to Arrays.asList(int[]).indexOf(int)
+   *        if performance problem occurs.
    * @param array
    * @param value
    * @return

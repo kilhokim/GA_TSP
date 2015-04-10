@@ -91,6 +91,7 @@ public class Main {
             }
 
             // 1. Select two paths p1 and p2 from the population
+            // TODO: Duplicated parents case?
             Path p1 = selection(ROULETTE_WHEEL_SELECTION);
             Path p2 = selection(ROULETTE_WHEEL_SELECTION);
 //        Path p1 = selection(TOURNAMENT_SELECTION);
