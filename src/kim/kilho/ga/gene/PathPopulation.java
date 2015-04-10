@@ -1,7 +1,8 @@
 package kim.kilho.ga.gene;
 
 /**
- * Created by kilho on 15. 4. 10.
+ * A population for paths considered in TSP
+ * @author Kilho Kim
  */
 public class PathPopulation {
 
@@ -13,7 +14,7 @@ public class PathPopulation {
     population = new Path[size];
     size = size;
     for (int i = 0; i < size; i++) {
-      population[i] = new Path(length, i, true);
+      population[i] = new Path(length, true, i);
       // System.out.println("------------ Path #" + i + " -----------------");
       // System.out.println(population[i].toString());
     }
