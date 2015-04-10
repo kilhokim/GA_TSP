@@ -93,35 +93,44 @@ public class Main {
         System.out.println("Start GA!");
         try {
             while (true) {
-                System.out.println("**********iter #" + (++iter) + "************");
+              System.out.println("**********iter #" + (++iter) + "************");
               if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1) {
-                  System.out.println("break!");
-                  break;    // end condition
+                System.out.println("break!");
+                break;    // end condition
+              }
+
+              if (iter > 100) {
+                System.out.println("break!");
+                break;
               }
 
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
-              Path p1 = selection(ROULETTE_WHEEL_SELECTION);
-              Path p2 = selection(ROULETTE_WHEEL_SELECTION);
-  //        Path p1 = selection(TOURNAMENT_SELECTION);
-  //        Path p2 = selection(TOURNAMENT_SELECTION);
-              System.out.println("p1: " + p1.toString());
-              System.out.println("p2: " + p2.toString());
+//              Path p1 = selection(ROULETTE_WHEEL_SELECTION);
+//              Path p2 = selection(ROULETTE_WHEEL_SELECTION);
+              Path p1 = selection(TOURNAMENT_SELECTION);
+              Path p2 = selection(TOURNAMENT_SELECTION);
+              System.out.println("p1: " + p1.toString()
+                      + " , idx=" + p1.getIdxInPopulation()
+                      + ", fitness=" + p1.getFitness());
+              System.out.println("p2: " + p2.toString()
+                      + " , idx=" + p2.getIdxInPopulation()
+                      + ", fitness=" + p2.getFitness());
 
               // 2. Crossover two paths to generate a new offspring
-              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-              System.out.println("offspring after crossover=" + offspring.toString());
-  //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
-  //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+//              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
+//                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
+                Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+              System.out.println("offspring after crossover: " + offspring.toString());
 
               // 3. Mutate the newly generated offspring
-              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
-              System.out.println("offspring after mutation=" + offspring.toString());
-  //            offspring = mutation(offspring, EXCHANGE_MUTATION);
-  //            offspring = mutation(offspring, INSERTION_MUTATION);
-  //            offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION);
-  //            offspring = mutation(offspring, INVERSION_MUTATION);
-  //            offspring = mutation(offspring, SCRAMBLE_MUTATION);
+//              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
+//              offspring = mutation(offspring, EXCHANGE_MUTATION);
+//              offspring = mutation(offspring, INSERTION_MUTATION);
+//              offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
+              offspring = mutation(offspring, INVERSION_MUTATION);
+//              offspring = mutation(offspring, SCRAMBLE_MUTATION);
+              System.out.println("offspring after mutation: " + offspring.toString());
 
               // 4. Evaluate the fitness value of newly generated offspring
               //    and update the best record
@@ -131,10 +140,10 @@ public class Main {
                   population.setRecord(offspring);
 
               // 5. Replace one of the path in population with the new offspring
-              population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
-  //            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
-  //            population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
-  //            population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
+//              population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
+//              population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
+//              population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
+              population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
               System.out.println("current record=" + population.getRecord());
               System.out.println("fitness=" + population.getRecord().getFitness());
             }

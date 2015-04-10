@@ -28,7 +28,7 @@ public final class ArrayUtils {
       output[i] = start + i;
     }
     for (i = 0; i < output.length; i++) {
-      int idx = i + rnd.nextInt(end-i);
+      int idx = i + rnd.nextInt(output.length-i);
       int tmp = output[idx]; output[idx] = output[i]; output[i] = tmp;  // swap
     }
     // TODO: Consider changing above to:

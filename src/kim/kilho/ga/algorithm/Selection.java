@@ -83,8 +83,11 @@ public class Selection {
 
     // Tournament candidates array where the selected paths are saved.
     Path[] candidates = new Path[numCandidates];
-    for (i = 0; i < numCandidates; i++)
+    for (i = 0; i < numCandidates; i++) {
       candidates[i] = population.get(idxs[i]);
+      // System.out.println("candidates #" + i + "=" + candidates[i].toString()
+      //                    + ", fitness=" + candidates[i].getFitness());
+    }
 
     return tournament(candidates, t)[0];
   }
@@ -116,9 +119,9 @@ public class Selection {
         nextRoundCandidates[i] = x1;
       else
         nextRoundCandidates[i] = x2;
+      // System.out.println("***nextRoundCandidates=" + nextRoundCandidates[i].toString());
     }
 
-    // System.out.println("***nextRoundCandidates= ");
     // for (int i = 0; i < nextRoundCandidates.length; i++) {
       // System.out.println(nextRoundCandidates[i]);
     // }

@@ -42,6 +42,7 @@ public class Replacement {
         worstCaseIdx = i;
       }
     }
+    System.out.println("worstCaseIdx=" + worstCaseIdx + ", maxFitness=" + maxFitness);
     population.set(worstCaseIdx, p);
     return population;
   }
@@ -56,13 +57,13 @@ public class Replacement {
    */
   public static PathPopulation worstParentReplacement(PathPopulation population,
                                                       Path p, Path p1, Path p2) {
-    int idx = 0;
+    int worstParentIdx = 0;
     // The bigger the fitness is, the worse the path is.
-    if (p1.getFitness() > p2.getFitness())
-      idx = p1.getIdxInPopulation();
-    else
-      idx = p2.getIdxInPopulation();
-    population.set(idx, p);
+    worstParentIdx = p1.getFitness() > p2.getFitness()
+                     ? p1.getIdxInPopulation() : p2.getIdxInPopulation();
+    System.out.println("worstParentIdx=" + worstParentIdx  + ", maxFitness="
+            + (p1.getFitness() > p2.getFitness() ? p1.getFitness() : p2.getFitness()));
+    population.set(worstParentIdx, p);
     return population;
   }
 

@@ -31,19 +31,20 @@ public class Mutation {
     int[] subpathIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     // System.out.println("subpathIdxs=" + Arrays.toString(subpathIdxs));
     Arrays.sort(subpathIdxs);
-    System.out.println("subpathIdxs=" + Arrays.toString(subpathIdxs));
+    // System.out.println("subpathIdxs=" + Arrays.toString(subpathIdxs));
     // Randomly pick a index as inserting point index of subpath
     int insertIdx = rnd.nextInt(p.getLength());
+
     // If the length of subpath equals the original length of parent
     if (subpathIdxs[1] - subpathIdxs[0] + 1 == p.getLength()) {
       insertIdx = 0;
-      System.out.println("insertIdx=" + insertIdx);
+      // System.out.println("insertIdx=" + insertIdx);
       newPath = p.getPath();
     } else {
       // Ensure insertIdx is not in between the starting index and ending index
       while (insertIdx >= subpathIdxs[0] && insertIdx <= subpathIdxs[1])
         insertIdx = rnd.nextInt(p.getLength());
-      System.out.println("insertIdx=" + insertIdx);
+      // System.out.println("insertIdx=" + insertIdx);
 
       // Insert the subpath right after the inserting point
       int i, j = 0, k = subpathIdxs[0];
@@ -73,6 +74,7 @@ public class Mutation {
 
     // Randomly pick two indices
     int[] exchangeIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
+    // System.out.println("exchangeIdxs=" + Arrays.toString(exchangeIdxs));
 
     for (int i = 0; i < newPath.length; i++) {
       if (i == exchangeIdxs[0])
@@ -103,6 +105,7 @@ public class Mutation {
     int[] randomIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     int removingIdx = randomIdxs[0];
     int insertingIdx = randomIdxs[1];
+    // System.out.println("removingIdx=" + removingIdx + ", insertingIdx=" + insertingIdx);
 
     int i, j = 0;
     for (i = 0; i < newPath.length; i++) {
@@ -129,13 +132,17 @@ public class Mutation {
     // Randomly pick two cut points
     int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     Arrays.sort(cutPointIdxs);
+    System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
 
     int i, k = cutPointIdxs[1];
     for (i = 0; i < newPath.length; i++) {
       if (i == cutPointIdxs[0]) {
-        while (k >= cutPointIdxs[0])
+        while (k >= cutPointIdxs[0]) {
+          // System.out.println("k=" + k);
           newPath[i++] = p.getPoint(k--);
-        newPath[i] = p.getPoint(i);
+        }
+        i--;
+        // newPath[i] = p.getPoint(i);
       } else
         newPath[i] = p.getPoint(i);
     }
@@ -161,18 +168,28 @@ public class Mutation {
     Arrays.sort(cutPointIdxs);
     // Randomly pick a index as inserting point index
     int insertIdx = rnd.nextInt(p.getLength());
-    // Ensure insertIdx is not in between the cutting indices
-    while (insertIdx >= cutPointIdxs[0] && insertIdx <= cutPointIdxs[1])
-      insertIdx = rnd.nextInt(p.getLength());
+    System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
 
-    // Insert the inversed subpath right after the inserting point
-    int i, j = 0, k = cutPointIdxs[1];
-    for (i = 0; i < newPath.length; i++) {
-      if (i >= cutPointIdxs[0] && i <= cutPointIdxs[1]) continue;
-      newPath[j++] = p.getPoint(i);
-      if (i == insertIdx)
-        while (k >= cutPointIdxs[0])
-          newPath[j++] = p.getPoint(k--);
+    // If the length of cut part equals the original length of parent
+    if (cutPointIdxs[1] - cutPointIdxs[0] + 1 == p.getLength()) {
+      insertIdx = 0;
+      System.out.println("insertIdx=" + insertIdx);
+      newPath = p.getPath();
+    } else {
+      // Ensure insertIdx is not in between the cutting indices
+      while (insertIdx >= cutPointIdxs[0] && insertIdx <= cutPointIdxs[1])
+        insertIdx = rnd.nextInt(p.getLength());
+      System.out.println("insertIdx=" + insertIdx);
+
+      // Insert the inversed subpath right after the inserting point
+      int i, j = 0, k = cutPointIdxs[1];
+      for (i = 0; i < newPath.length; i++) {
+        if (i >= cutPointIdxs[0] && i <= cutPointIdxs[1]) continue;
+        newPath[j++] = p.getPoint(i);
+        if (i == insertIdx)
+          while (k >= cutPointIdxs[0])
+            newPath[j++] = p.getPoint(k--);
+      }
     }
 
     offspring.setPath(newPath);

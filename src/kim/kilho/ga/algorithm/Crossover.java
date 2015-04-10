@@ -79,10 +79,12 @@ public class Crossover {
       tmp[i-cutPointIdxs[0]] = p1.getPoint(i);
 
     // Put points after the right limit of the cut part.
-    for (i = cutPointIdxs[1]+1; i < p1.getLength(); i++)
-      // Put a point only if cut part doesn't contain it.
-      if (ArrayUtils.indexOf(tmp, p2.getPoint(i)) == -1)
-        newPath[j++] = p2.getPoint(i);
+    if (cutPointIdxs[1] < p1.getLength()-1) { // the right cut point must not be the last point
+      for (i = cutPointIdxs[1] + 1; i < p1.getLength(); i++)
+        // Put a point only if cut part doesn't contain it.
+        if (ArrayUtils.indexOf(tmp, p2.getPoint(i)) == -1)
+          newPath[j++] = p2.getPoint(i);
+    }
 
     // Put points in the cut part in newPath.
     for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
