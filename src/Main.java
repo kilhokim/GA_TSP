@@ -1,7 +1,9 @@
 import kim.kilho.ga.algorithm.Crossover;
 import kim.kilho.ga.algorithm.Mutation;
+import kim.kilho.ga.algorithm.Replacement;
 import kim.kilho.ga.algorithm.Selection;
 import kim.kilho.ga.gene.Path;
+import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
 import kim.kilho.ga.util.PointUtils;
@@ -10,52 +12,12 @@ import java.util.Random;
 
 public class Main {
 
-    /*
-    // static void Input(String fileName) {  }
-
-    static void Input() {  }
-
-    static void Initialize() {  }
-
-    static int Selection(int selectionMethod) { return -1; }
-
-    static int Roulette() {  return -1; }
-
-    static int Tournament() { return -1; }
-
-    static void Crossover(int p1, int p2, int crossoverMethod) {  }
-
-    static void ER(int p1, int p2) {  }
-
-    static void OX(int p1, int p2) {  }
-
-    static void Mutation(int mutationMethod) {  }
-
-    static void DM() {  }
-
-    static void IVM() { }
-
-    static void SIM() {  }
-
-    static void Evaluation() { }
-
-    static void Replacement(int p1, int p2) {}
-
-    static void GA(int selectionMethod, int crossoverMethod, int mutationMethod) {  }
-
-    static void Output() {}
-    */
-
     public static final int MAXN = 318; // Maximum value of N
     public static final int PSIZE = 100;  // Size of the population
     // Population of solutions.
-    static Path[] population = new Path[PSIZE];
-    // Best (found) solution.
-    static Path record = null;
-
+    static PathPopulation population;
     // Total array of points.
     static Point[] points = null;
-
     // Time limit for the test case
     static double timeLimit;
 
@@ -74,6 +36,15 @@ public class Main {
 
     // Mutation
     public static final int DISPLACEMENT_MUTATION = 1;
+    public static final int EXCHANGE_MUTATION = 2;
+    public static final int INSERTION_MUTATION = 3;
+    public static final int SIMPLE_INVERSION_MUTATION = 4;
+    public static final int INVERSION_MUTATION = 5;
+    public static final int SCRAMBLE_MUTATION = 6;
+
+    // Replacement
+    public static final int RANDOM_REPLACEMENT = 1;
+    public static final int WORST_CASE_REPLACEMENT = 2;
 
     // How to run:
     // $ java Test data/cycle.in
@@ -81,8 +52,6 @@ public class Main {
 
         init(args);
         GA();
-
-        // System.out.println(System.getProperty("user.dir"));
     }
 
     // Read the test case from file.
@@ -110,11 +79,7 @@ public class Main {
     private static void GA() {
         long begin = System.currentTimeMillis()/1000;
 
-        for (int i = 0; i < population.length; i++) {
-            population[i] = new Path(MAXN, true);
-            // System.out.println("------------ Path #" + i + " -----------------");
-            // System.out.println(population[i].toString());
-        }
+        population = new PathPopulation(PSIZE, MAXN);
 
         try {
             // while (true) {
@@ -133,6 +98,14 @@ public class Main {
 //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
             offspring = mutation(offspring, DISPLACEMENT_MUTATION);
+//            offspring = mutation(offspring, EXCHANGE_MUTATION);
+//            offspring = mutation(offspring, INSERTION_MUTATION);
+//            offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION);
+//            offspring = mutation(offspring, INVERSION_MUTATION);
+//            offspring = mutation(offspring, SCRAMBLE_MUTATION);
+            offspring.evaluate(points);
+            population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
+            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
             // Path[] offsprings = null; // TODO: add offsprings into this path array
             // }
         } catch (Exception e) {
@@ -149,14 +122,14 @@ public class Main {
     private static Path selection(int option) throws Exception {
         switch(option) {
             // 1. Roulette Wheel Selection.
-            case 1:
+            case ROULETTE_WHEEL_SELECTION:
                 return Selection.rouletteWheelSelection(population,
                         SELECTION_PRESSURE_PARAM);
-            case 2:
+            case TOURNAMENT_SELECTION:
                 return Selection.tournamentSelection(population,
                         SELECTION_TOURNAMENT_T);
             default:
-                throw new Exception("Invalid option input.");
+                throw new Exception("Invalid option param.");
         }
     }
 
@@ -169,7 +142,7 @@ public class Main {
             case PARTIALLY_MATCHED_CROSSOVER:
                 return Crossover.partiallyMatchedCrossover(p1, p2);
             default:
-                throw new Exception("Invalid option input.");
+                throw new Exception("Invalid option param.");
         }
     }
 
@@ -177,8 +150,18 @@ public class Main {
         switch(option) {
             case DISPLACEMENT_MUTATION:
                 return Mutation.displacementMutation(p);
+            case EXCHANGE_MUTATION:
+                return Mutation.exchangeMutation(p);
+            case INSERTION_MUTATION:
+                return Mutation.insertionMutation(p);
+            case SIMPLE_INVERSION_MUTATION:
+                return Mutation.simpleInversionMutation(p);
+            case INVERSION_MUTATION:
+                return Mutation.inversionMutation(p);
+            case SCRAMBLE_MUTATION:
+                return Mutation.scrambleMutation(p);
             default:
-                throw new Exception("Invalid option input.");
+                throw new Exception("Invalid option param.");
         }
     }
 
@@ -186,13 +169,15 @@ public class Main {
      * Replace one solution from the population with the new offspring.
      * Currently any random solution can be replaced.
      */
-    private static void replacement(Path p) {
-        // FIXME:
-        Random rnd = new Random();
-        int idx = rnd.nextInt(population.length);
-        population[idx].setFitness(p.getFitness());
-        for (int i = 0; i < MAXN; i++)
-            population[idx].setPath(p.getPath());
+    private static PathPopulation replacement(Path p, int option, Path p1, Path p2) throws Exception {
+        switch(option) {
+            case RANDOM_REPLACEMENT:
+                return Replacement.randomReplacement(population, p);
+            case WORST_CASE_REPLACEMENT:
+                return Replacement.worstCaseReplacement(population, p);
+            default:
+                throw new Exception("Invalid option param.");
+        }
     }
 }
 

@@ -21,7 +21,7 @@ public class Crossover {
    */
   public static Path cycleCrossover(Path p1, Path p2) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p1.getLength(), false);
+    Path offspring = new Path(p1.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p1.getLength()];
     // Indices array which stores occupied indices in newPath.
     int[] occupiedIdxs = new int[p1.getLength()];

@@ -21,7 +21,7 @@ public class Mutation {
    */
   public static Path displacementMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
 
     Random rnd = new Random();
@@ -56,7 +56,7 @@ public class Mutation {
    */
   public static Path exchangeMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
 
     // Randomly pick two indices
@@ -83,7 +83,7 @@ public class Mutation {
    */
   public static Path insertionMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
     Random rnd = new Random();
 
@@ -111,7 +111,7 @@ public class Mutation {
    */
   public static Path simpleInversionMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
 
     // Randomly pick two cut points
@@ -139,7 +139,7 @@ public class Mutation {
    */
   public static Path inversionMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
 
     Random rnd = new Random();
@@ -174,7 +174,7 @@ public class Mutation {
    */
   public static Path scrambleMutation(Path p) {
     // Generate a new offspring with empty path.
-    Path offspring = new Path(p.getLength(), false);
+    Path offspring = new Path(p.getLength(), false); // idxInPopulation has not assigned yet.
     int[] newPath = new int[p.getLength()];
 
     // Randomly pick two cut points

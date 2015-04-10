@@ -13,6 +13,7 @@ import java.util.Random;
 // TODO: public class Path implements Chromosome {
 public class Path {
   private int[] path;  // the sequence of indices of points
+  private int idxInPopulation;  // the index of the path in population
   private int length;  // the total length of path sequence
   private double fitness; // fitness for the path
 
@@ -27,20 +28,46 @@ public class Path {
     }
     // Initialize fitness as the maximum value.
     fitness = 1e100;
+    // Newly generated path's index in population has not assigned yet.
+    idxInPopulation = -1;
+  }
+
+  public Path(int maxLength, boolean randomGeneration, int idxInPopulation) {
+    length = maxLength;
+
+    // Initialize path as a random order-based path
+    // if randomGeneration is checked true.
+    if (randomGeneration) {
+      // Generate a random order-based path.
+      path = ArrayUtils.genRandomIntegers(0, maxLength);
+    }
+    // Initialize fitness as the maximum value.
+    fitness = 1e100;
+    idxInPopulation = idxInPopulation;
   }
 
   public int getLength() {
     return length;
   }
 
-  // Set the fitness value.
-  public void setFitness(double f) {
-    fitness = f;
+  // Get the index of the path in population.
+  public int getIdxInPopulation() {
+    return idxInPopulation;
+  }
+
+  // Set the index of the path in population.
+  public void setIdxInPopulation(int i) {
+    idxInPopulation = i;
   }
 
   // Get the fitness value.
   public double getFitness() {
     return fitness;
+  }
+
+  // Set the fitness value.
+  public void setFitness(double f) {
+    fitness = f;
   }
 
   // Get the sequence of indices of points.
@@ -63,7 +90,7 @@ public class Path {
     fitness = 0;
     for (int i = 0; i < getLength(); i++) {
       fitness += PointUtils.distance(points[getPointAt(i)],
-              points[getPointAt((i + 1) % getLength())]);
+              points[getPointAt((i+1) % getLength())]);
     }
 
     return fitness;
