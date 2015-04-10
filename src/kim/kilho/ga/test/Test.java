@@ -6,6 +6,7 @@ import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.util.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 /**
  * Test class, only for test-purpose
@@ -13,7 +14,24 @@ import java.util.Arrays;
 public class Test {
 
   public static void main(String[] args) {
-    crossoverTest();
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+
+    // Collections.shuffle(Arrays.asList(array));
+    // int[] array = ArrayUtils.genRandomIntegers(0, 6);
+    // System.out.println(Arrays.toString(array));
+
+
+
+    // crossoverTest();
     // mutationTest();
   }
 

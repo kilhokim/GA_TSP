@@ -5,6 +5,7 @@ import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.util.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -18,12 +19,14 @@ public class Selection {
    * @param population
    * @return Path
    */
-  public static Path rouletteWheelSelection(PathPopulation population, double selectionPressureParam) {
+  public static Path rouletteWheelSelection(PathPopulation population,
+                                            double selectionPressureParam) {
     double sumOfFitness = 0, sum = 0;
     double minCost = Double.MAX_VALUE, maxCost = 0, currCost;
     // Fitness values used in Selection
     // for each solution in the original population.
     double[] selectionFitness = new double[population.size()];
+    // System.out.println("selectionFitness=" + Arrays.toString(selectionFitness));
     Random rnd = new Random();
     int i;
 
@@ -35,12 +38,14 @@ public class Selection {
       else if (currCost < minCost)
         minCost = currCost;
     }
+
     // Calculate the Selection fitness values for each solution.
     for (i = 0; i < population.size(); i++) {
       currCost = population.get(i).getFitness();
       selectionFitness[i] = (maxCost - currCost)
               + (maxCost - minCost)/(selectionPressureParam-1);
     }
+    // System.out.println("selectionFitness=" + Arrays.toString(selectionFitness));
 
     // TODO: Rank-based Selection
     // TODO: Sharing
@@ -50,7 +55,7 @@ public class Selection {
       // System.out.println("#" + i + " sumOfFitness=" + sumOfFitness);
     }
     double point = rnd.nextDouble() * sumOfFitness;
-    // System.out.println("point=" + point);
+    System.out.println("point=" + point);
 
     for (i = 0; i < population.size(); i++) {
       sum += selectionFitness[i];
@@ -75,12 +80,6 @@ public class Selection {
     int numCandidates = (int)Math.pow(2, k-1);
     // Indices randomly picked up in [0, population.length)
     int[] idxs = ArrayUtils.genRandomIntegers(0, population.size());
-
-    // DEBUG:
-    // System.out.print("idxs= ");
-    // for (i = 0; i < numCandidates; i++)
-      // System.out.print(idxs[i] + " ");
-    // System.out.print("\n");
 
     // Tournament candidates array where the selected paths are saved.
     Path[] candidates = new Path[numCandidates];

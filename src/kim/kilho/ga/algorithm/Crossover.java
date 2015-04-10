@@ -14,7 +14,7 @@ import java.util.Random;
 public class Crossover {
 
   /**
-   * Cycle Crossover.
+   * Cycle Crossover(CX).
    * @param p1
    * @param p2
    * @return Path
@@ -31,11 +31,11 @@ public class Crossover {
     while (count < p1.getLength()) {
       occupiedIdxs[count++] = i;
       if (currOnP1) {
-        newPath[i] = p1.getPath()[i];
-        i = ArrayUtils.indexOf(p1.getPath(), p2.getPath()[i]);
+        newPath[i] = p1.getPoint(i);
+        i = ArrayUtils.indexOf(p1.getPath(), p2.getPoint(i));
       } else {
-        newPath[i] = p2.getPath()[i];
-        i = ArrayUtils.indexOf(p2.getPath(), p1.getPath()[i]);
+        newPath[i] = p2.getPoint(i);
+        i = ArrayUtils.indexOf(p2.getPath(), p1.getPoint(i));
       }
       // If the indicator i comes back to the initial index,
       // switch on/off the currOnP1 value and reset the initIdx.
@@ -57,7 +57,7 @@ public class Crossover {
   }
 
   /**
-   * Order Crossover.
+   * Order Crossover(OX).
    * @param p1
    * @param p2
    * @return Path
@@ -76,13 +76,13 @@ public class Crossover {
     // Temporarily store the cut part.
     int[] tmp = new int[cutPointIdxs[1]-cutPointIdxs[0]+1];
     for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
-      tmp[i-cutPointIdxs[0]] = p1.getPath()[i];
+      tmp[i-cutPointIdxs[0]] = p1.getPoint(i);
 
     // Put points after the right limit of the cut part.
     for (i = cutPointIdxs[1]+1; i < p1.getLength(); i++)
       // Put a point only if cut part doesn't contain it.
-      if (ArrayUtils.indexOf(tmp, p2.getPath()[i]) == -1)
-        newPath[j++] = p2.getPath()[i];
+      if (ArrayUtils.indexOf(tmp, p2.getPoint(i)) == -1)
+        newPath[j++] = p2.getPoint(i);
 
     // Put points in the cut part in newPath.
     for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
@@ -91,8 +91,8 @@ public class Crossover {
     // Put points before the right limit of the cut part
     for (i = 0; i <= cutPointIdxs[1]; i++)
       // Put a point only if cut part doesn't contain it.
-      if (ArrayUtils.indexOf(tmp, p2.getPath()[i]) == -1)
-        newPath[j++] = p2.getPath()[i];
+      if (ArrayUtils.indexOf(tmp, p2.getPoint(i)) == -1)
+        newPath[j++] = p2.getPoint(i);
 
     offspring.setPath(newPath);
 
@@ -119,7 +119,7 @@ public class Crossover {
     // Temporarily store the cut part.
     int[] tmp = new int[cutPointIdxs[1]-cutPointIdxs[0]+1];
     for (i = cutPointIdxs[0]; i <= cutPointIdxs[1]; i++)
-      tmp[i-cutPointIdxs[0]] = p1.getPath()[i];
+      tmp[i-cutPointIdxs[0]] = p1.getPoint(i);
 
     // PMX process...
     for (i = 0; i < newPath.length; i++) {
@@ -127,9 +127,9 @@ public class Crossover {
         newPath[i] = tmp[i-cutPointIdxs[0]];
       else {
         k = i;
-        while (ArrayUtils.indexOf(tmp, p2.getPath()[k]) != -1)
-          k = ArrayUtils.indexOf(tmp, p2.getPath()[k]) + cutPointIdxs[0];
-        newPath[i] = p2.getPath()[k];
+        while (ArrayUtils.indexOf(tmp, p2.getPoint(k)) != -1)
+          k = ArrayUtils.indexOf(tmp, p2.getPoint(k)) + cutPointIdxs[0];
+        newPath[i] = p2.getPoint(k);
       }
     }
 

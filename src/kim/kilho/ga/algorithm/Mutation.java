@@ -27,23 +27,35 @@ public class Mutation {
     Random rnd = new Random();
 
     // Randomly pick two indices as starting index and ending index of subpath
+    // System.out.println("p.getLength()=" + p.getLength());
     int[] subpathIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
+    // System.out.println("subpathIdxs=" + Arrays.toString(subpathIdxs));
     Arrays.sort(subpathIdxs);
+    System.out.println("subpathIdxs=" + Arrays.toString(subpathIdxs));
     // Randomly pick a index as inserting point index of subpath
     int insertIdx = rnd.nextInt(p.getLength());
-    // Ensure insertIdx is not in between the starting index and ending index
-    while (insertIdx >= subpathIdxs[0] && insertIdx <= subpathIdxs[1])
-      insertIdx = rnd.nextInt(p.getLength());
+    // If the length of subpath equals the original length of parent
+    if (subpathIdxs[1] - subpathIdxs[0] + 1 == p.getLength()) {
+      insertIdx = 0;
+      System.out.println("insertIdx=" + insertIdx);
+      newPath = p.getPath();
+    } else {
+      // Ensure insertIdx is not in between the starting index and ending index
+      while (insertIdx >= subpathIdxs[0] && insertIdx <= subpathIdxs[1])
+        insertIdx = rnd.nextInt(p.getLength());
+      System.out.println("insertIdx=" + insertIdx);
 
-    // Insert the subpath right after the inserting point
-    int i, j = 0, k = subpathIdxs[0];
-    for (i = 0; i < newPath.length; i++) {
-      if (i >= subpathIdxs[0] && i <= subpathIdxs[1]) continue;
-      newPath[j++] = p.getPath()[i];
-      if (i == insertIdx)
-        while (k <= subpathIdxs[1])
-          newPath[j++] = p.getPath()[k++];
+      // Insert the subpath right after the inserting point
+      int i, j = 0, k = subpathIdxs[0];
+      for (i = 0; i < newPath.length; i++) {
+        if (i >= subpathIdxs[0] && i <= subpathIdxs[1]) continue;
+        newPath[j++] = p.getPoint(i);
+        if (i == insertIdx)
+          while (k <= subpathIdxs[1])
+            newPath[j++] = p.getPoint(k++);
+      }
     }
+
 
     offspring.setPath(newPath);
     return offspring;
@@ -64,11 +76,11 @@ public class Mutation {
 
     for (int i = 0; i < newPath.length; i++) {
       if (i == exchangeIdxs[0])
-        newPath[i] = p.getPath()[exchangeIdxs[1]];
+        newPath[i] = p.getPoint(exchangeIdxs[1]);
       else if (i == exchangeIdxs[1])
-        newPath[i] = p.getPath()[exchangeIdxs[0]];
+        newPath[i] = p.getPoint(exchangeIdxs[0]);
       else
-        newPath[i] = p.getPath()[i];
+        newPath[i] = p.getPoint(i);
       }
 
     offspring.setPath(newPath);
@@ -95,9 +107,9 @@ public class Mutation {
     int i, j = 0;
     for (i = 0; i < newPath.length; i++) {
       if (i == removingIdx) continue;
-      newPath[j++] = p.getPath()[i];
+      newPath[j++] = p.getPoint(i);
       if (i == insertingIdx)
-        newPath[j++] = p.getPath()[removingIdx];
+        newPath[j++] = p.getPoint(removingIdx);
     }
 
     offspring.setPath(newPath);
@@ -122,10 +134,10 @@ public class Mutation {
     for (i = 0; i < newPath.length; i++) {
       if (i == cutPointIdxs[0]) {
         while (k >= cutPointIdxs[0])
-          newPath[i++] = p.getPath()[k--];
-        newPath[i] = p.getPath()[i];
+          newPath[i++] = p.getPoint(k--);
+        newPath[i] = p.getPoint(i);
       } else
-        newPath[i] = p.getPath()[i];
+        newPath[i] = p.getPoint(i);
     }
 
     offspring.setPath(newPath);
@@ -157,10 +169,10 @@ public class Mutation {
     int i, j = 0, k = cutPointIdxs[1];
     for (i = 0; i < newPath.length; i++) {
       if (i >= cutPointIdxs[0] && i <= cutPointIdxs[1]) continue;
-      newPath[j++] = p.getPath()[i];
+      newPath[j++] = p.getPoint(i);
       if (i == insertIdx)
         while (k >= cutPointIdxs[0])
-          newPath[j++] = p.getPath()[k--];
+          newPath[j++] = p.getPoint(k--);
     }
 
     offspring.setPath(newPath);
@@ -187,10 +199,10 @@ public class Mutation {
     for (i = 0; i < newPath.length; i++) {
       if (i == cutPointIdxs[0]) {
         while (k < subpathIdxs.length)
-          newPath[i++] = p.getPath()[subpathIdxs[k++]];
-        newPath[i] = p.getPath()[i];
+          newPath[i++] = p.getPoint(subpathIdxs[k++]);
+        newPath[i] = p.getPoint(i);
       } else
-        newPath[i] = p.getPath()[i];
+        newPath[i] = p.getPoint(i);
     }
 
     offspring.setPath(newPath);

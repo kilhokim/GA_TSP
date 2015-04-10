@@ -1,3 +1,5 @@
+package kim.kilho.ga;
+
 import kim.kilho.ga.algorithm.Crossover;
 import kim.kilho.ga.algorithm.Mutation;
 import kim.kilho.ga.algorithm.Replacement;
@@ -54,6 +56,9 @@ public class Main {
 
         init(args);
         GA();
+
+        System.out.println("The best record: " + population.getRecord().toString());
+        System.out.println("fitness: " + population.getRecord().getFitness());
     }
 
     // Read the test case from file.
@@ -63,15 +68,15 @@ public class Main {
             Object[] input = fm.read(args[0], MAXN);
             points = (Point[])input[0];
             timeLimit = (Double)input[1];
-            // System.out.println("Total number of points=" + points.length);
+            System.out.println("Total number of points=" + points.length);
             for (int i = 0; i < points.length; i++) {
                 System.out.println(points[i].toString());
             }
-            // System.out.println("Total time limit=" + timeLimit);
+            System.out.println("Total time limit=" + timeLimit);
             // System.out.println(PointUtils.distance(points[0], points[1]));
             // System.out.println(PointUtils.distance(points[1], points[2]));
         } catch (Exception e) {
-            e.getMessage();
+            e.printStackTrace();
         }
     }
 
@@ -79,50 +84,62 @@ public class Main {
      * A 'steady-state' GA
      */
     private static void GA() {
-        long begin = System.currentTimeMillis()/1000;
+        int iter = 0;
+        long beginTime = System.currentTimeMillis()/1000;
 
-        population = new PathPopulation(PSIZE, MAXN);
+        population = new PathPopulation(PSIZE, points.length);
+        population.evaluateAll(points);
 
+        System.out.println("Start GA!");
         try {
-            // while (true) {
-            if (System.currentTimeMillis()/1000 - begin >= timeLimit - 1) {
-                System.out.println("break!");
-                // break;    // end condition
+            while (true) {
+                System.out.println("**********iter #" + (++iter) + "************");
+              if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1) {
+                  System.out.println("break!");
+                  break;    // end condition
+              }
+
+              // 1. Select two paths p1 and p2 from the population
+              // TODO: Duplicated parents case?
+              Path p1 = selection(ROULETTE_WHEEL_SELECTION);
+              Path p2 = selection(ROULETTE_WHEEL_SELECTION);
+  //        Path p1 = selection(TOURNAMENT_SELECTION);
+  //        Path p2 = selection(TOURNAMENT_SELECTION);
+              System.out.println("p1: " + p1.toString());
+              System.out.println("p2: " + p2.toString());
+
+              // 2. Crossover two paths to generate a new offspring
+              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
+              System.out.println("offspring after crossover=" + offspring.toString());
+  //        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
+  //        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+
+              // 3. Mutate the newly generated offspring
+              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
+              System.out.println("offspring after mutation=" + offspring.toString());
+  //            offspring = mutation(offspring, EXCHANGE_MUTATION);
+  //            offspring = mutation(offspring, INSERTION_MUTATION);
+  //            offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION);
+  //            offspring = mutation(offspring, INVERSION_MUTATION);
+  //            offspring = mutation(offspring, SCRAMBLE_MUTATION);
+
+              // 4. Evaluate the fitness value of newly generated offspring
+              //    and update the best record
+              offspring.evaluate(points);
+              System.out.println("fitness of the offspring=" + offspring.getFitness());
+              if (population.getRecord().getFitness() > offspring.getFitness())
+                  population.setRecord(offspring);
+
+              // 5. Replace one of the path in population with the new offspring
+              population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
+  //            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
+  //            population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
+  //            population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
+              System.out.println("current record=" + population.getRecord());
+              System.out.println("fitness=" + population.getRecord().getFitness());
             }
-
-            // 1. Select two paths p1 and p2 from the population
-            // TODO: Duplicated parents case?
-            Path p1 = selection(ROULETTE_WHEEL_SELECTION);
-            Path p2 = selection(ROULETTE_WHEEL_SELECTION);
-//        Path p1 = selection(TOURNAMENT_SELECTION);
-//        Path p2 = selection(TOURNAMENT_SELECTION);
-            System.out.println("p1: " + p1.toString());
-            System.out.println("p2: " + p2.toString());
-
-            // 2. Crossover two paths to generate a new offspring
-            Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-//        Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
-//        Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
-
-            // 3. Mutate the newly generated offspring
-            offspring = mutation(offspring, DISPLACEMENT_MUTATION);
-//            offspring = mutation(offspring, EXCHANGE_MUTATION);
-//            offspring = mutation(offspring, INSERTION_MUTATION);
-//            offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION);
-//            offspring = mutation(offspring, INVERSION_MUTATION);
-//            offspring = mutation(offspring, SCRAMBLE_MUTATION);
-
-            // 4. Evaluate the fitness value of newly generated offspring
-            offspring.evaluate(points);
-
-            // 5. Replace one of the path in population with the new offspring
-            population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
-//            population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
-//            population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
-//            population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
-            // }
         } catch (Exception e) {
-            e.getMessage();
+            e.printStackTrace();
         }
     }
 
@@ -182,7 +199,8 @@ public class Main {
      * Replace one solution from the population with the new offspring.
      * Currently any random solution can be replaced.
      */
-    private static PathPopulation replacement(Path p, int option, Path p1, Path p2) throws Exception {
+    private static PathPopulation replacement(Path p, int option,
+                                              Path p1, Path p2) throws Exception {
         switch(option) {
             case RANDOM_REPLACEMENT:
                 return Replacement.randomReplacement(population, p);

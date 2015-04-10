@@ -2,6 +2,8 @@ package kim.kilho.ga.util;
 
 import kim.kilho.ga.exception.InvalidParamException;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -22,13 +24,16 @@ public final class ArrayUtils {
     int[] output = new int[end-start];
     int i;
     Random rnd = new Random();
-    for (i = start; i < end; i++) {
-      output[i-start] = i;
+    for (i = 0; i < output.length; i++) {
+      output[i] = start + i;
     }
-    for (i = start; i < end; i++) {
+    for (i = 0; i < output.length; i++) {
       int idx = i + rnd.nextInt(end-i);
-      int tmp = output[idx-start]; output[idx-start] = output[i-start]; output[i-start] = tmp;  // swap
+      int tmp = output[idx]; output[idx] = output[i]; output[i] = tmp;  // swap
     }
+    // TODO: Consider changing above to:
+    // Collections.shuffle(Arrays.asList(output));
+    // System.out.println(Arrays.toString(output));
 
     return output;
   }
@@ -42,22 +47,12 @@ public final class ArrayUtils {
    */
   public static int[] genRandomIntegers(int start, int end, int num)
           throws InvalidParamException {
-    if (start > end) throw new InvalidParamException("Invalid parameter: start, end");
     if (num > end-start) throw new InvalidParamException("Invalid parameter: num");
 
-    int[] randomInts = new int[end-start];
+    int[] randomInts = genRandomIntegers(start, end);
     int[] output = new int[num];
-    int i;
-    Random rnd = new Random();
-    for (i = start; i < end; i++) {
-      randomInts[i-start] = i;
-    }
-    for (i = start; i < end; i++) {
-      int idx = i + rnd.nextInt(end-i);
-      int tmp = randomInts[idx-start]; randomInts[idx-start] = randomInts[i-start]; randomInts[i-start] = tmp;  // swap
-    }
 
-    for (i = 0; i < num; i++)
+    for (int i = 0; i < num; i++)
       output[i] = randomInts[i];
 
     return output;

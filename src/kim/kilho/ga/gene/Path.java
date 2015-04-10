@@ -4,6 +4,7 @@ import kim.kilho.ga.exception.PathException;
 import kim.kilho.ga.util.ArrayUtils;
 import kim.kilho.ga.util.PointUtils;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -25,6 +26,7 @@ public class Path {
     if (randomGeneration) {
       // Generate a random order-based path.
       path = ArrayUtils.genRandomIntegers(0, maxLength);
+      // System.out.println("newly generated path=" + Arrays.toString(path));
     }
     // Initialize fitness as the maximum value.
     fitness = 1e100;
@@ -40,10 +42,11 @@ public class Path {
     if (randomGeneration) {
       // Generate a random order-based path.
       path = ArrayUtils.genRandomIntegers(0, maxLength);
+      // System.out.println("newly generated path #" + idxInPopulation + "=" + Arrays.toString(path));
     }
     // Initialize fitness as the maximum value.
     fitness = 1e100;
-    idxInPopulation = idxInPopulation;
+    this.idxInPopulation = idxInPopulation;
   }
 
   public int getLength() {
@@ -81,16 +84,18 @@ public class Path {
   }
 
   // Get the idx'th point in the path.
-  public int getPointAt(int idx) {
+  public int getPoint(int idx) {
     return path[idx];
   }
 
   // Calculate the fitness of the path.
   public double evaluate(Point[] points) {
     fitness = 0;
+    // System.out.println("getLength()=" + getLength());
     for (int i = 0; i < getLength(); i++) {
-      fitness += PointUtils.distance(points[getPointAt(i)],
-              points[getPointAt((i+1) % getLength())]);
+      // System.out.println("points[getPointAt(i)]=" + points[getPointAt(i)]);
+      fitness += PointUtils.distance(points[getPoint(i)],
+              points[getPoint((i+1) % getLength())]);
     }
 
     return fitness;

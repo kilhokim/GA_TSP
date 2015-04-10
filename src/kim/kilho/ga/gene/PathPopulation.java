@@ -12,7 +12,7 @@ public class PathPopulation {
 
   public PathPopulation(int size, int length) {
     population = new Path[size];
-    size = size;
+    this.size = size;
     for (int i = 0; i < size; i++) {
       population[i] = new Path(length, true, i);
       // System.out.println("------------ Path #" + i + " -----------------");
@@ -48,12 +48,21 @@ public class PathPopulation {
     population[i] = path;
   }
 
+  public void evaluateAll(Point[] points) {
+    for (int i = 0; i < population.length; i++)
+      population[i].evaluate(points);
+  }
+
   /**
    * Get the best (found) path in the population.
    * @return Path
    */
-  public Path getBest() {
+  public Path getRecord() {
     return record;
+  }
+
+  public void setRecord(Path path) {
+    record = path;
   }
 
 
