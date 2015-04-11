@@ -139,4 +139,94 @@ public class Crossover {
 
     return offspring;
   }
+
+  public static Path edgeRecombination(Path p1, Path p2) {
+    // Generate a new offspring with empty path.
+    Path offspring = new Path(p1.getLength(), false); // idxInPopulation has not assigned yet.
+    int[] newPath = new int[p1.getLength()];
+    int i, j, k;
+    for (i = 0; i < newPath.length; i++)
+      newPath[i] = -1;
+
+    // Edge table for recombination
+    int[][] edgeTable = new int[p1.getLength()][4];
+    // Actual length of the each row of edgeTable
+    int[] edgeTableLength = new int[p1.getLength()];
+    // Initialize every element in edge table as -1
+    for (i = 0; i < edgeTable.length; i++) {
+      for (j = 0; j < 4; j++) {
+        edgeTable[i][j] = -1;
+      }
+    }
+
+    Path[] ps = {p1, p2};
+    Path currP;
+    int currPoint, prevPoint, nextPoint;
+    for (k = 0; k < ps.length; k++) {
+      currP = ps[k];
+      // Search parent path and update the edge table
+      for (i = 0; i < currP.getLength(); i++) {
+        currPoint = currP.getPoint(i);
+        // Search previous point by branching if statement
+        // in order to prevent ArrayIndexOutOfBoundsException
+        if (i == 0)
+          prevPoint = currP.getPoint(currP.getLength()-1);
+        else
+          prevPoint = currP.getPoint(i-1);
+        // Search next point
+        nextPoint = currP.getPoint((i+1)%currP.getLength());
+
+        // Add prevPoint to the currPoint row in edgeTable if not exists
+        if (ArrayUtils.indexOf(edgeTable[currPoint], prevPoint) == -1) {
+          edgeTable[currPoint][edgeTableLength[currPoint]] = prevPoint;
+          edgeTableLength[currPoint] += 1;
+        }
+        // Add nextPoint to the currPoint row in edgeTable if not exists
+        if (ArrayUtils.indexOf(edgeTable[currPoint], nextPoint) == -1) {
+          edgeTable[currPoint][edgeTableLength[currPoint]] = nextPoint;
+          edgeTableLength[currPoint] += 1;
+        }
+      }
+    }
+
+    // DEBUG
+    for (i = 0; i < edgeTable.length; i++) {
+      System.out.println(i + ": " + Arrays.toString(edgeTable[i]));
+    }
+
+    i = 0;
+    Random rnd = new Random();
+    int minLength, currPointIdx, currInvestigatingPoint;
+    int nextPointIdx = rnd.nextInt(edgeTable.length);
+    newPath[i] = p1.getPoint(i);
+    currPointIdx = newPath[i++];
+    while (i < newPath.length) {
+      // Set minLength to 5 (and must be lowered)
+      minLength = 5;
+      for (j = 0; j < edgeTableLength[currPointIdx]; j++) {
+        currInvestigatingPoint = edgeTable[currPointIdx][j];
+        // If newPath doesn't have currently investigating point yet,
+        if (ArrayUtils.indexOf(newPath, currInvestigatingPoint) == -1) {
+          if (edgeTableLength[currInvestigatingPoint] < minLength) {
+            minLength = edgeTableLength[currInvestigatingPoint];
+            nextPointIdx = currInvestigatingPoint;
+          } else if (edgeTableLength[currInvestigatingPoint] == minLength)
+            nextPointIdx = rnd.nextDouble() > 0.5 ? nextPointIdx : currInvestigatingPoint;
+        }
+      }
+      // If it passed every points in the row
+      // (minLength has not changed and is still 5)
+      if (minLength == 5)
+        for (k = 0; k < p1.getLength(); k++)
+          // If k has not included in newPath yet, start again from it
+          if (ArrayUtils.indexOf(newPath, k) == -1)
+            nextPointIdx = k;
+      newPath[i++] = nextPointIdx;
+      currPointIdx = nextPointIdx;
+    }
+
+    offspring.setPath(newPath);
+
+    return offspring;
+  }
 }

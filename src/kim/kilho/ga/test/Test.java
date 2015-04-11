@@ -14,34 +14,9 @@ import java.util.Collections;
 public class Test {
 
   public static void main(String[] args) {
-    String inputFileName = "data/cycle.in.101";
-    StringBuilder outputFileName = new StringBuilder();
-    String[] inputFilePaths = inputFileName.split("/");
-    String[] inputFileNames = inputFilePaths[inputFilePaths.length-1]
-                                 .split("\\.");
-    for (int i = 0; i < inputFilePaths.length-1; i++) {
-      outputFileName.append(inputFilePaths[i]);
-      outputFileName.append("/");
-    }
-    outputFileName.append(inputFileNames[0]);
-    outputFileName.append(".out");
-    if (inputFileNames.length > 2) {
-      for (int i = 2; i < inputFileNames.length; i++) {
-        outputFileName.append(".");
-        outputFileName.append(inputFileNames[i]);
-      }
-    }
-    System.out.println(outputFileName.toString());
-//    System.out.println(Arrays.toString(inputFileNames));
 
 
-    // Collections.shuffle(Arrays.asList(array));
-    // int[] array = ArrayUtils.genRandomIntegers(0, 6);
-    // System.out.println(Arrays.toString(array));
-
-
-
-    // crossoverTest();
+    crossoverTest();
     // mutationTest();
   }
 
@@ -49,10 +24,14 @@ public class Test {
     Path p1 = new Path(10, true);
     Path p2 = new Path(10, true);
 
+//    int[] arr1 = {0,1,2,3,4,5,6,8,7,9};
+//    int[] arr2 = {2,5,0,9,7,3,8,6,1,4};
+//    p1.setPath(arr1);
+//    p2.setPath(arr2);
     System.out.println("p1: " + p1.toString());
     System.out.println("p2: " + p2.toString());
 
-    Path offspring = Crossover.partiallyMatchedCrossover(p1, p2);
+    Path offspring = Crossover.edgeRecombination(p1, p2);
     System.out.println("offspring: " + offspring.toString());
   }
 

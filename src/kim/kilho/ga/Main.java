@@ -141,8 +141,9 @@ public class Main {
 
               // 2. Crossover two paths to generate a new offspring
 //              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
+//                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
 //                Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+                Path offspring = crossover(p1, p2, EDGE_RECOMBINATION);
               System.out.println("offspring after crossover: " + offspring.toString());
 
               // 3. Mutate the newly generated offspring
@@ -183,7 +184,8 @@ public class Main {
 
     /**
      * Choose one path from the population.
-     * Currently this operator randomly chooses one with uniform distribution.
+     * @return Path
+     * @exception Exception
      * @return Path
      */
     private static Path selection(int option) throws Exception {
@@ -208,6 +210,8 @@ public class Main {
                 return Crossover.orderCrossover(p1, p2);
             case PARTIALLY_MATCHED_CROSSOVER:
                 return Crossover.partiallyMatchedCrossover(p1, p2);
+            case EDGE_RECOMBINATION:
+                return Crossover.edgeRecombination(p1, p2);
             default:
                 throw new Exception("Invalid option param.");
         }
@@ -234,7 +238,12 @@ public class Main {
 
     /**
      * Replace one solution from the population with the new offspring.
-     * Currently any random solution can be replaced.
+     * @param p
+     * @param option
+     * @param p1
+     * @prarm p2
+     * @exception Exception
+     * @return PathPopulation
      */
     private static PathPopulation replacement(Path p, int option,
                                               Path p1, Path p2) throws Exception {
