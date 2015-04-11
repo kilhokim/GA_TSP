@@ -5,10 +5,7 @@ import kim.kilho.ga.exception.PathException;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.Point;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.NumberFormat;
 
 /**
@@ -37,18 +34,18 @@ public class FileManager {
     double availableTime;
     int i;  // iteration variable
     String[] coordinates;  // save line which is read during iteration as coordinates
-    BufferedReader bis = null;
+    BufferedReader br = null;
     Point[] points;
     Object[] output = new Object[2];
 
     // Generate a new file reader
     // throw IOException for the following line:
-    bis = new BufferedReader(new FileReader(fileName));
+    br = new BufferedReader(new FileReader(fileName));
 
     // Get the total number of points from the first line,
     try {
       // catch & throw NumberFormatException for the following line:
-      numPoints = Integer.parseInt(bis.readLine());
+      numPoints = Integer.parseInt(br.readLine());
     } catch (NumberFormatException e) {
       throw new InvalidInputException("Invalid input for the number of points.");
     }
@@ -59,7 +56,7 @@ public class FileManager {
     // Get every point from each lines and add it to path,
     points = new Point[numPoints];
     for (i = 0; i < numPoints; i++) {
-      coordinates = bis.readLine().split(" ");
+      coordinates = br.readLine().split(" ");
       // if coordinates' dimension isn't two, throw InvalidInputException.
       if (coordinates.length != 2)
         throw new InvalidInputException("Invalid input for point coordinates");
@@ -70,10 +67,11 @@ public class FileManager {
     // Get the total available time from the last line,
     try {
       // catch & throw NumberFormatException for the following line:
-      availableTime = Double.parseDouble(bis.readLine());
+      availableTime = Double.parseDouble(br.readLine());
     } catch (NumberFormatException e) {
       throw new InvalidInputException("Invalid input for the available time.");
     }
+    br.close();
 
     output[0] = points;
     output[1] = availableTime;
@@ -82,11 +80,35 @@ public class FileManager {
   }
 
   /**
-   *
-   * @param fileName
+   * Write the best result to file.
+   * @param inputFileName
    */
-  public void write(String fileName) {
-    // TODO: Complete implementing write method
+  public void write(String inputFileName, Path path) throws IOException {
+    // Building the output filename from the input filename.
+    StringBuilder outputFileName = new StringBuilder();
+    String[] inputFilePaths = inputFileName.split("/");
+    String[] inputFileNames = inputFilePaths[inputFilePaths.length-1]
+                                .split("\\.");
+    for (int i = 0; i < inputFilePaths.length-1; i++) {
+      outputFileName.append(inputFilePaths[i]);
+      outputFileName.append("/");
+    }
+    outputFileName.append(inputFileNames[0]);
+    outputFileName.append(".out");
+    if (inputFileNames.length > 2) {
+      for (int i = 2; i < inputFileNames.length; i++) {
+        outputFileName.append(".");
+        outputFileName.append(inputFileNames[i]);
+      }
+    }
+
+    BufferedWriter bw = null;
+
+    // Generate a new file writer
+    // throw IOException for the following line:
+    bw = new BufferedWriter(new FileWriter(outputFileName.toString()));
+    bw.write(path.toString());
+    bw.close();
   }
 
 }

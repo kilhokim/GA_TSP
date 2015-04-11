@@ -106,7 +106,8 @@ public class Path {
     StringBuilder output = new StringBuilder();
     for (int i = 0; i < path.length; i++) {
       output.append(path[i]);
-      output.append(" ");
+      if (i < path.length-1)
+        output.append(" ");
     }
     return output.toString();
   }

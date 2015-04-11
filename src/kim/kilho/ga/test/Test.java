@@ -14,16 +14,26 @@ import java.util.Collections;
 public class Test {
 
   public static void main(String[] args) {
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
-    System.out.println(Arrays.toString(ArrayUtils.genRandomIntegers(0, 6, 2)));
+    String inputFileName = "data/cycle.in.101";
+    StringBuilder outputFileName = new StringBuilder();
+    String[] inputFilePaths = inputFileName.split("/");
+    String[] inputFileNames = inputFilePaths[inputFilePaths.length-1]
+                                 .split("\\.");
+    for (int i = 0; i < inputFilePaths.length-1; i++) {
+      outputFileName.append(inputFilePaths[i]);
+      outputFileName.append("/");
+    }
+    outputFileName.append(inputFileNames[0]);
+    outputFileName.append(".out");
+    if (inputFileNames.length > 2) {
+      for (int i = 2; i < inputFileNames.length; i++) {
+        outputFileName.append(".");
+        outputFileName.append(inputFileNames[i]);
+      }
+    }
+    System.out.println(outputFileName.toString());
+//    System.out.println(Arrays.toString(inputFileNames));
+
 
     // Collections.shuffle(Arrays.asList(array));
     // int[] array = ArrayUtils.genRandomIntegers(0, 6);

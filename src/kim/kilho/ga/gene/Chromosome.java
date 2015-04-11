@@ -4,6 +4,7 @@ package kim.kilho.ga.gene;
  * Chromosome interface. ''DEPRECATED''
  * @author Kilho Kim
  */
+@Deprecated
 public interface Chromosome {
 
   // Get the length of the chromosome.

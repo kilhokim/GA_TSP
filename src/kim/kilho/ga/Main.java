@@ -23,6 +23,8 @@ public class Main {
     // Time limit for the test case
     static double timeLimit;
 
+    static FileManager fm;
+
     // Constants
     // Selection
     public static final int ROULETTE_WHEEL_SELECTION = 1;
@@ -37,6 +39,7 @@ public class Main {
     public static final int EDGE_RECOMBINATION = 4;
 
     // Mutation
+    public static final double MUTATION_PROBABILITY = 0.3;
     public static final int DISPLACEMENT_MUTATION = 1;
     public static final int EXCHANGE_MUTATION = 2;
     public static final int INSERTION_MUTATION = 3;
@@ -56,14 +59,18 @@ public class Main {
 
         init(args);
         GA();
-
         System.out.println("The best record: " + population.getRecord().toString());
         System.out.println("fitness: " + population.getRecord().getFitness());
+        finalize(args);
+
     }
 
-    // Read the test case from file.
+    /**
+     * Read the test case from file.
+     * @param args
+     */
     private static void init(String[] args) {
-        FileManager fm = new FileManager();
+        fm = new FileManager();
         try {
             Object[] input = fm.read(args[0], MAXN);
             points = (Point[])input[0];
@@ -81,11 +88,24 @@ public class Main {
     }
 
     /**
+     * Write the best result to file.
+     * @param args
+     */
+    private static void finalize(String[] args) {
+      try {
+        fm.write(args[0], population.getRecord());
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
+    /**
      * A 'steady-state' GA
      */
     private static void GA() {
         int iter = 0;
         long beginTime = System.currentTimeMillis()/1000;
+        Random rnd = new Random();
 
         population = new PathPopulation(PSIZE, points.length);
         population.evaluateAll(points);
@@ -99,10 +119,12 @@ public class Main {
                 break;    // end condition
               }
 
+              /*
               if (iter > 100) {
                 System.out.println("break!");
                 break;
               }
+              */
 
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
@@ -119,18 +141,24 @@ public class Main {
 
               // 2. Crossover two paths to generate a new offspring
 //              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-//                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
-                Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
+//                Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
               System.out.println("offspring after crossover: " + offspring.toString());
 
               // 3. Mutate the newly generated offspring
-//              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
-//              offspring = mutation(offspring, EXCHANGE_MUTATION);
-//              offspring = mutation(offspring, INSERTION_MUTATION);
-//              offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
-              offspring = mutation(offspring, INVERSION_MUTATION);
-//              offspring = mutation(offspring, SCRAMBLE_MUTATION);
-              System.out.println("offspring after mutation: " + offspring.toString());
+              //    if generated [0, 1) random value exceeds
+              //    the mutation probability
+              if (rnd.nextDouble() < MUTATION_PROBABILITY) {
+                //              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
+                //              offspring = mutation(offspring, EXCHANGE_MUTATION);
+                //              offspring = mutation(offspring, INSERTION_MUTATION);
+                //              offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
+                offspring = mutation(offspring, INVERSION_MUTATION);
+                //              offspring = mutation(offspring, SCRAMBLE_MUTATION);
+                System.out.println("offspring after mutation: " + offspring.toString());
+              } else {
+                System.out.println("offspring without mutation: " + offspring.toString());
+              }
 
               // 4. Evaluate the fitness value of newly generated offspring
               //    and update the best record

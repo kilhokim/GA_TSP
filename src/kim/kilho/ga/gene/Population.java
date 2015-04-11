@@ -4,6 +4,7 @@ package kim.kilho.ga.gene;
  * Population interface.  ''DEPRECATED''
  * @author Kilho Kim
  */
+@Deprecated
 public interface Population {
 
   /**
