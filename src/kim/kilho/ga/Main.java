@@ -60,7 +60,7 @@ public class Main {
         init(args);
         GA();
         System.out.println("The best record: " + population.getRecord().toString());
-        System.out.println("fitness: " + population.getRecord().getFitness());
+        System.out.println("Distance: " + population.getRecord().getDistance());
         finalize(args);
 
     }
@@ -134,10 +134,10 @@ public class Main {
               Path p2 = selection(TOURNAMENT_SELECTION);
               System.out.println("p1: " + p1.toString()
                       + " , idx=" + p1.getIdxInPopulation()
-                      + ", fitness=" + p1.getFitness());
+                      + ", distance=" + p1.getDistance());
               System.out.println("p2: " + p2.toString()
                       + " , idx=" + p2.getIdxInPopulation()
-                      + ", fitness=" + p2.getFitness());
+                      + ", distance=" + p2.getDistance());
 
               // 2. Crossover two paths to generate a new offspring
 //              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
@@ -160,11 +160,11 @@ public class Main {
                 System.out.println("offspring without mutation: " + offspring.toString());
               }
 
-              // 4. Evaluate the fitness value of newly generated offspring
+              // 4. Evaluate the distance value of newly generated offspring
               //    and update the best record
               offspring.evaluate(points);
-              System.out.println("fitness of the offspring=" + offspring.getFitness());
-              if (population.getRecord().getFitness() > offspring.getFitness())
+              System.out.println("distance of the offspring=" + offspring.getDistance());
+              if (population.getRecord().getDistance() > offspring.getDistance())
                   population.setRecord(offspring);
 
               // 5. Replace one of the path in population with the new offspring
@@ -173,7 +173,7 @@ public class Main {
 //              population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
               population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
               System.out.println("current record=" + population.getRecord());
-              System.out.println("fitness=" + population.getRecord().getFitness());
+              System.out.println("distance=" + population.getRecord().getDistance());
             }
         } catch (Exception e) {
             e.printStackTrace();

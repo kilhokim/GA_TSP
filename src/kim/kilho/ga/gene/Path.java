@@ -16,7 +16,7 @@ public class Path {
   private int[] path;  // the sequence of indices of points
   private int idxInPopulation;  // the index of the path in population
   private int length;  // the total length of path sequence
-  private double fitness; // fitness for the path
+  private double distance; // total distance for the path
 
   public Path(int maxLength, boolean randomGeneration) {
     length = maxLength;
@@ -28,8 +28,8 @@ public class Path {
       path = ArrayUtils.genRandomIntegers(0, maxLength);
       // System.out.println("newly generated path=" + Arrays.toString(path));
     }
-    // Initialize fitness as the maximum value.
-    fitness = 1e100;
+    // Initialize distance as the maximum value.
+    distance = 1e100;
     // Newly generated path's index in population has not assigned yet.
     idxInPopulation = -1;
   }
@@ -44,8 +44,8 @@ public class Path {
       path = ArrayUtils.genRandomIntegers(0, maxLength);
       // System.out.println("newly generated path #" + idxInPopulation + "=" + Arrays.toString(path));
     }
-    // Initialize fitness as the maximum value.
-    fitness = 1e100;
+    // Initialize distance as the maximum value.
+    distance = 1e100;
     this.idxInPopulation = idxInPopulation;
   }
 
@@ -63,14 +63,14 @@ public class Path {
     idxInPopulation = i;
   }
 
-  // Get the fitness value.
-  public double getFitness() {
-    return fitness;
+  // Get the distance value.
+  public double getDistance() {
+    return distance;
   }
 
-  // Set the fitness value.
-  public void setFitness(double f) {
-    fitness = f;
+  // Set the distance value.
+  public void setDistance(double d) {
+    distance = d;
   }
 
   // Get the sequence of indices of points.
@@ -88,17 +88,17 @@ public class Path {
     return path[idx];
   }
 
-  // Calculate the fitness of the path.
+  // Calculate the distance of the path.
   public double evaluate(Point[] points) {
-    fitness = 0;
+    distance = 0;
     // System.out.println("getLength()=" + getLength());
     for (int i = 0; i < getLength(); i++) {
       // System.out.println("points[getPointAt(i)]=" + points[getPointAt(i)]);
-      fitness += PointUtils.distance(points[getPoint(i)],
+      distance += PointUtils.distance(points[getPoint(i)],
               points[getPoint((i+1) % getLength())]);
     }
 
-    return fitness;
+    return distance;
   }
 
   // String representation of the path.

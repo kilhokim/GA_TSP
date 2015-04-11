@@ -21,44 +21,44 @@ public class Selection {
    */
   public static Path rouletteWheelSelection(PathPopulation population,
                                             double selectionPressureParam) {
-    double sumOfFitness = 0, sum = 0;
+    double sumOfDistance = 0, sum = 0;
     double minCost = Double.MAX_VALUE, maxCost = 0, currCost;
-    // Fitness values used in Selection
+    // Distance values used in Selection
     // for each solution in the original population.
-    double[] selectionFitness = new double[population.size()];
-    // System.out.println("selectionFitness=" + Arrays.toString(selectionFitness));
+    double[] selectionDistance = new double[population.size()];
+    // System.out.println("selectionDistance=" + Arrays.toString(selectionDistance));
     Random rnd = new Random();
     int i;
 
-    // Pick up the maximum and the minimum fitness value.
+    // Pick up the maximum and the minimum distance value.
     for (i = 0; i < population.size(); i++) {
-      currCost = population.get(i).getFitness();
+      currCost = population.get(i).getDistance();
       if (currCost > maxCost)
         maxCost = currCost;
       else if (currCost < minCost)
         minCost = currCost;
     }
 
-    // Calculate the Selection fitness values for each solution.
+    // Calculate the Selection distance values for each solution.
     for (i = 0; i < population.size(); i++) {
-      currCost = population.get(i).getFitness();
-      selectionFitness[i] = (maxCost - currCost)
+      currCost = population.get(i).getDistance();
+      selectionDistance[i] = (maxCost - currCost)
               + (maxCost - minCost)/(selectionPressureParam-1);
     }
-    // System.out.println("selectionFitness=" + Arrays.toString(selectionFitness));
+    // System.out.println("selectionDistance=" + Arrays.toString(selectionDistance));
 
     // TODO: Rank-based Selection
     // TODO: Sharing
 
     for (i = 0; i < population.size(); i++) {
-      sumOfFitness += selectionFitness[i];
-      // System.out.println("#" + i + " sumOfFitness=" + sumOfFitness);
+      sumOfDistance+= selectionDistance[i];
+      // System.out.println("#" + i + " sumOfDistance=" + sumOfDistance);
     }
-    double point = rnd.nextDouble() * sumOfFitness;
+    double point = rnd.nextDouble() * sumOfDistance;
     System.out.println("point=" + point);
 
     for (i = 0; i < population.size(); i++) {
-      sum += selectionFitness[i];
+      sum += selectionDistance[i];
       // System.out.println("#" + i + " sum=" + sum);
       if (point < sum) return population.get(i);
     }
@@ -86,7 +86,7 @@ public class Selection {
     for (i = 0; i < numCandidates; i++) {
       candidates[i] = population.get(idxs[i]);
       // System.out.println("candidates #" + i + "=" + candidates[i].toString()
-      //                    + ", fitness=" + candidates[i].getFitness());
+      //                    + ", distance=" + candidates[i].getDistance());
     }
 
     return tournament(candidates, t)[0];
@@ -107,11 +107,11 @@ public class Selection {
     for (int i = 0; i < candidates.length/2; i++) {
       Path x1 = candidates[2*i];
       Path x2 = candidates[2*i+1];
-      // Ensure x1's fitness is always better(smaller) than x2's
-      if (x1.getFitness() > x2.getFitness()) {
+      // Ensure x1's distance is always better(smaller) than x2's
+      if (x1.getDistance() > x2.getDistance()) {
         Path tmp = x1; x1 = x2; x2 = tmp; // Swap
       }
-      // System.out.println("x1.fitness=" + x1.getFitness() + ", x2.fitness=" + x2.getFitness());
+      // System.out.println("x1.distance=" + x1.getDistance() + ", x2.distance=" + x2.getDistance());
 
       double r = rnd.nextDouble();
       // System.out.println("r=" + r);
