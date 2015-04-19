@@ -51,19 +51,23 @@ public class Selection {
     // TODO: Sharing
 
     for (i = 0; i < population.size(); i++) {
-      sumOfDistance+= selectionDistance[i];
+      sumOfDistance += selectionDistance[i];
       // System.out.println("#" + i + " sumOfDistance=" + sumOfDistance);
     }
     double point = rnd.nextDouble() * sumOfDistance;
-    System.out.println("point=" + point);
+    // System.out.println("point=" + point);
 
     for (i = 0; i < population.size(); i++) {
       sum += selectionDistance[i];
       // System.out.println("#" + i + " sum=" + sum);
-      if (point < sum) return population.get(i);
+      if (point < sum) {
+        // System.out.println("point=" + point + ", sum=" + sum);
+        return population.get(i);
+      }
     }
 
-    throw new SelectionException("Error! This shouldn't be reached!");
+    return population.get(population.size()-1);
+    // throw new SelectionException("Error! This shouldn't be reached!");
   }
 
   /**

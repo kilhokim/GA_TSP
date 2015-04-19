@@ -132,7 +132,7 @@ public class Mutation {
     // Randomly pick two cut points
     int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     Arrays.sort(cutPointIdxs);
-    System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
+    // System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
 
     int i, k = cutPointIdxs[1];
     for (i = 0; i < newPath.length; i++) {
@@ -168,18 +168,18 @@ public class Mutation {
     Arrays.sort(cutPointIdxs);
     // Randomly pick a index as inserting point index
     int insertIdx = rnd.nextInt(p.getLength());
-    System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
+    // System.out.println("cutPointIdxs=" + Arrays.toString(cutPointIdxs));
 
     // If the length of cut part equals the original length of parent
     if (cutPointIdxs[1] - cutPointIdxs[0] + 1 == p.getLength()) {
       insertIdx = 0;
-      System.out.println("insertIdx=" + insertIdx);
+      // System.out.println("insertIdx=" + insertIdx);
       newPath = p.getPath();
     } else {
       // Ensure insertIdx is not in between the cutting indices
       while (insertIdx >= cutPointIdxs[0] && insertIdx <= cutPointIdxs[1])
         insertIdx = rnd.nextInt(p.getLength());
-      System.out.println("insertIdx=" + insertIdx);
+      // System.out.println("insertIdx=" + insertIdx);
 
       // Insert the inversed subpath right after the inserting point
       int i, j = 0, k = cutPointIdxs[1];
@@ -209,7 +209,7 @@ public class Mutation {
     // Randomly pick two cut points
     int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p.getLength(), 2);
     Arrays.sort(cutPointIdxs);
-    System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
+    // System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
 
     int[] subpathIdxs = ArrayUtils.genRandomIntegers(cutPointIdxs[0], cutPointIdxs[1]);
     int i, k = 0;

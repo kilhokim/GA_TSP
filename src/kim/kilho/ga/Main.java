@@ -10,6 +10,8 @@ import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
 import kim.kilho.ga.util.PointUtils;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Random;
 
 public class Main {
@@ -29,8 +31,8 @@ public class Main {
     // Selection
     public static final int ROULETTE_WHEEL_SELECTION = 1;
       public static final double SELECTION_PRESSURE_PARAM = 3;
-      public static final double SELECTION_TOURNAMENT_T = 0.9;
     public static final int TOURNAMENT_SELECTION = 2;
+      public static final double SELECTION_TOURNAMENT_T = 0.9;
 
     // Crossover
     public static final int CYCLE_CROSSOVER = 1;
@@ -54,14 +56,89 @@ public class Main {
     public static final int WORST_PARENT_CASE_REPLACEMENT = 4;
 
     // How to run:
-    // $ java Test data/cycle.in
+    // $ java Main data/cycle.in
     public static void main(String[] args) {
+      final int NUM_ITERATIONS = 30;
+      // HashMap<int[], double[]> results = new HashMap<int[], double[]>();
 
-        init(args);
-        GA();
-        System.out.println("The best record: " + population.getRecord().toString());
-        System.out.println("Distance: " + population.getRecord().getDistance());
-        finalize(args);
+      for (int se = 2; se <= 2; se++) {
+        for (int xo = 2; xo <= 2; xo++) {
+          for (int mt = 1; mt <= 1; mt++) {
+            for (int rp = 4; rp <= 4; rp++) {
+              // int[] key = {se, xo, mt, rp};
+              double[] result = new double[NUM_ITERATIONS];
+              System.out.println("se: " + se + ", xo: " + xo
+                      + ", mt: " + mt + ", rp: " + rp);
+
+              for (int i = 0; i < result.length; i++) {
+                System.out.println("*****************rep #" + i + "*************");
+                init(args);
+                GA(se, xo, mt, rp);
+                // System.out.println("The best record: " + population.getRecord().toString());
+                // System.out.println("Distance: " + population.getRecord().getDistance());
+                result[i] = population.getRecord().getDistance();
+                // Inserted code for iteration:
+                String[] args_mod = new String[1];
+                args_mod[0] = args[0] + "_" + "t" + i;
+                finalize(args_mod);
+              }
+
+              // results.put(key, result);
+              double avg = 0;
+              double sd = 0;
+              double min = Double.MAX_VALUE;
+              System.out.println("Total results:");
+              for (int i = 0; i < result.length; i++) {
+                // System.out.println("iter #" + i);
+                // System.out.println("Distance: " + result[i]);
+                System.out.println(result[i]);
+                avg += result[i];
+                if (result[i] < min) min = result[i];
+              }
+              avg /= result.length;
+              for (int i = 0; i < result.length; i++)
+                sd += Math.pow(Math.abs(result[i] - avg), 2);
+              sd = Math.sqrt(sd/result.length);
+              System.out.println("Aggregated result:");
+              System.out.println(avg);
+              System.out.println(min);
+              System.out.println(sd);
+            }
+          }
+        }
+      }
+
+      /*
+      for (int[] key : results.keySet()) {
+        System.out.println(Arrays.toString(key));
+        double[] result = results.get(key);
+        double avg = 0;
+        double sd = 0;
+        double min = Double.MAX_VALUE;
+        for (int i = 0; i < result.length; i++) {
+          // System.out.println("iter #" + i);
+          // System.out.println("Distance: " + result[i]);
+          // System.out.println(result[i]);
+          avg += result[i];
+          if (result[i] < min) min = result[i];
+        }
+        avg /= result.length;
+        for (int i = 0; i < result.length; i++)
+          sd += Math.pow(Math.abs(result[i] - avg), 2);
+        sd = Math.sqrt(sd);
+        System.out.println(avg);
+        System.out.println(min);
+        System.out.println(sd);
+      }
+      */
+
+      /*
+      for (int i = 0; i < result.length; i++) {
+        // System.out.println("iter #" + i);
+        // System.out.println("Distance: " + result[i]);
+        System.out.println(result[i]);
+      }
+      */
 
     }
 
@@ -75,11 +152,11 @@ public class Main {
             Object[] input = fm.read(args[0], MAXN);
             points = (Point[])input[0];
             timeLimit = (Double)input[1];
-            System.out.println("Total number of points=" + points.length);
+            // System.out.println("Total number of points=" + points.length);
             for (int i = 0; i < points.length; i++) {
-                System.out.println(points[i].toString());
+                // System.out.println(points[i].toString());
             }
-            System.out.println("Total time limit=" + timeLimit);
+            // System.out.println("Total time limit=" + timeLimit);
             // System.out.println(PointUtils.distance(points[0], points[1]));
             // System.out.println(PointUtils.distance(points[1], points[2]));
         } catch (Exception e) {
@@ -102,7 +179,8 @@ public class Main {
     /**
      * A 'steady-state' GA
      */
-    private static void GA() {
+    private static void GA(int selection, int crossover,
+                           int mutation, int replacement) {
         int iter = 0;
         long beginTime = System.currentTimeMillis()/1000;
         Random rnd = new Random();
@@ -110,12 +188,13 @@ public class Main {
         population = new PathPopulation(PSIZE, points.length);
         population.evaluateAll(points);
 
-        System.out.println("Start GA!");
+        // System.out.println("Start GA!");
         try {
             while (true) {
-              System.out.println("**********iter #" + (++iter) + "************");
+              // if (++iter % 100000 == 0)
+                // System.out.println("**********iter #" + (iter) + "************");
               if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1) {
-                System.out.println("break!");
+                // System.out.println("break!");
                 break;    // end condition
               }
 
@@ -128,53 +207,102 @@ public class Main {
 
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
-//              Path p1 = selection(ROULETTE_WHEEL_SELECTION);
-//              Path p2 = selection(ROULETTE_WHEEL_SELECTION);
-              Path p1 = selection(TOURNAMENT_SELECTION);
-              Path p2 = selection(TOURNAMENT_SELECTION);
+              Path p1 = null;
+              Path p2 = null;
+              switch (selection) {
+                case ROULETTE_WHEEL_SELECTION:
+                  p1 = selection(ROULETTE_WHEEL_SELECTION);
+  //              p2 = selection(ROULETTE_WHEEL_SELECTION);
+                case TOURNAMENT_SELECTION:
+                  p1 = selection(TOURNAMENT_SELECTION);
+                  p2 = selection(TOURNAMENT_SELECTION);
+                default:
+              }
+              /*
               System.out.println("p1: " + p1.toString()
                       + " , idx=" + p1.getIdxInPopulation()
                       + ", distance=" + p1.getDistance());
               System.out.println("p2: " + p2.toString()
                       + " , idx=" + p2.getIdxInPopulation()
                       + ", distance=" + p2.getDistance());
+                      */
 
               // 2. Crossover two paths to generate a new offspring
-//              Path offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-//                Path offspring = crossover(p1, p2, ORDER_CROSSOVER);
-//                Path offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
-                Path offspring = crossover(p1, p2, EDGE_RECOMBINATION);
-              System.out.println("offspring after crossover: " + offspring.toString());
+              Path offspring = null;
+              switch (crossover) {
+                case CYCLE_CROSSOVER:
+                  offspring = crossover(p1, p2, CYCLE_CROSSOVER);
+                case ORDER_CROSSOVER:
+                  offspring = crossover(p1, p2, ORDER_CROSSOVER);
+                case PARTIALLY_MATCHED_CROSSOVER:
+                  offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
+                case EDGE_RECOMBINATION:
+                  offspring = crossover(p1, p2, EDGE_RECOMBINATION);
+                default:
+              }
+              // System.out.println("offspring after crossover: " + offspring.toString());
 
               // 3. Mutate the newly generated offspring
               //    if generated [0, 1) random value exceeds
               //    the mutation probability
               if (rnd.nextDouble() < MUTATION_PROBABILITY) {
-                //              offspring = mutation(offspring, DISPLACEMENT_MUTATION);
-                //              offspring = mutation(offspring, EXCHANGE_MUTATION);
-                //              offspring = mutation(offspring, INSERTION_MUTATION);
-                //              offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
-                offspring = mutation(offspring, INVERSION_MUTATION);
-                //              offspring = mutation(offspring, SCRAMBLE_MUTATION);
-                System.out.println("offspring after mutation: " + offspring.toString());
+                switch (mutation) {
+                  case DISPLACEMENT_MUTATION:
+                    offspring = mutation(offspring, DISPLACEMENT_MUTATION);
+                    break;
+                  case EXCHANGE_MUTATION:
+                    offspring = mutation(offspring, EXCHANGE_MUTATION);
+                  case INSERTION_MUTATION:
+                    offspring = mutation(offspring, INSERTION_MUTATION);
+                  case SIMPLE_INVERSION_MUTATION:
+                    offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
+                  case INVERSION_MUTATION:
+                    offspring = mutation(offspring, INVERSION_MUTATION);
+                  case SCRAMBLE_MUTATION:
+                    offspring = mutation(offspring, SCRAMBLE_MUTATION);
+                  default:
+                }
+                // System.out.println("offspring after mutation: " + offspring.toString());
               } else {
-                System.out.println("offspring without mutation: " + offspring.toString());
+                // System.out.println("offspring without mutation: " + offspring.toString());
               }
 
               // 4. Evaluate the distance value of newly generated offspring
               //    and update the best record
               offspring.evaluate(points);
-              System.out.println("distance of the offspring=" + offspring.getDistance());
-              if (population.getRecord().getDistance() > offspring.getDistance())
-                  population.setRecord(offspring);
+              // System.out.println("distance of the offspring=" + offspring.getDistance());
+              if (population.getRecord().getDistance() > offspring.getDistance()) {
+                population.setRecord(offspring);
+                // System.out.println("current record=" + population.getRecord());
+                // System.out.println("distance=" + population.getRecord().getDistance());
+              }
 
               // 5. Replace one of the path in population with the new offspring
-//              population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
-//              population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
-//              population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
-              population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
-              System.out.println("current record=" + population.getRecord());
-              System.out.println("distance=" + population.getRecord().getDistance());
+              switch (replacement) {
+                case RANDOM_REPLACEMENT:
+                  population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
+                case WORST_CASE_REPLACEMENT:
+                  population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
+                case WORST_PARENT_REPLACEMENT:
+                  population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
+                case WORST_PARENT_CASE_REPLACEMENT:
+                  population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
+                default:
+              }
+              // System.out.println("current record=" + population.getRecord());
+              // System.out.println("distance=" + population.getRecord().getDistance());
+
+              /*
+              if (++iter % 100000 == 0) {
+                double avgDist = 0;
+                for (int i = 0; i < population.size(); i++)
+                  avgDist += population.get(i).getDistance();
+                avgDist /= population.size();
+                System.out.println(iter + "," + avgDist + ","
+                                 + population.getRecord().getDistance()
+                                  ) ;
+              }
+              */
             }
         } catch (Exception e) {
             e.printStackTrace();

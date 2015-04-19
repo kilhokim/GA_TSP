@@ -42,7 +42,7 @@ public class Replacement {
         worstCaseIdx = i;
       }
     }
-    System.out.println("worstCaseIdx=" + worstCaseIdx + ", maxDistance=" + maxDistance);
+    // System.out.println("worstCaseIdx=" + worstCaseIdx + ", maxDistance=" + maxDistance);
     population.set(worstCaseIdx, p);
     return population;
   }
@@ -61,8 +61,10 @@ public class Replacement {
     // The bigger the distance is, the worse the path is.
     worstParentIdx = p1.getDistance() > p2.getDistance()
                      ? p1.getIdxInPopulation() : p2.getIdxInPopulation();
+    /*
     System.out.println("worstParentIdx=" + worstParentIdx  + ", maxDistance="
             + (p1.getDistance() > p2.getDistance() ? p1.getDistance() : p2.getDistance()));
+            */
     population.set(worstParentIdx, p);
     return population;
   }

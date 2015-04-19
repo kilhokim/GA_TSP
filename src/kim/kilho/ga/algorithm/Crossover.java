@@ -70,7 +70,7 @@ public class Crossover {
     // Randomly pick two cut points
     int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p1.getLength(), 2);
     Arrays.sort(cutPointIdxs);
-    System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
+    // System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
 
     int i, j = 0;
     // Temporarily store the cut part.
@@ -115,7 +115,7 @@ public class Crossover {
     // Randomly pick two cut points
     int[] cutPointIdxs = ArrayUtils.genRandomIntegers(0, p1.getLength(), 2);
     Arrays.sort(cutPointIdxs);
-    System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
+    // System.out.println("cutPointIdxs=[" + cutPointIdxs[0] + "," + cutPointIdxs[1] + "]");
 
     int i, k = 0;
     // Temporarily store the cut part.
@@ -190,9 +190,11 @@ public class Crossover {
     }
 
     // DEBUG
+    /*
     for (i = 0; i < edgeTable.length; i++) {
       System.out.println(i + ": " + Arrays.toString(edgeTable[i]));
     }
+    */
 
     i = 0;
     Random rnd = new Random();
