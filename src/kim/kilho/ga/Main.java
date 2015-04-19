@@ -61,84 +61,43 @@ public class Main {
       final int NUM_ITERATIONS = 30;
       // HashMap<int[], double[]> results = new HashMap<int[], double[]>();
 
-      for (int se = 2; se <= 2; se++) {
-        for (int xo = 2; xo <= 2; xo++) {
-          for (int mt = 1; mt <= 1; mt++) {
-            for (int rp = 4; rp <= 4; rp++) {
-              // int[] key = {se, xo, mt, rp};
-              double[] result = new double[NUM_ITERATIONS];
-              System.out.println("se: " + se + ", xo: " + xo
-                      + ", mt: " + mt + ", rp: " + rp);
+      // int[] key = {se, xo, mt, rp};
+      double[] result = new double[NUM_ITERATIONS];
 
-              for (int i = 0; i < result.length; i++) {
-                System.out.println("*****************rep #" + i + "*************");
-                init(args);
-                GA(se, xo, mt, rp);
-                // System.out.println("The best record: " + population.getRecord().toString());
-                // System.out.println("Distance: " + population.getRecord().getDistance());
-                result[i] = population.getRecord().getDistance();
-                // Inserted code for iteration:
-                String[] args_mod = new String[1];
-                args_mod[0] = args[0] + "_" + "t" + i;
-                finalize(args_mod);
-              }
-
-              // results.put(key, result);
-              double avg = 0;
-              double sd = 0;
-              double min = Double.MAX_VALUE;
-              System.out.println("Total results:");
-              for (int i = 0; i < result.length; i++) {
-                // System.out.println("iter #" + i);
-                // System.out.println("Distance: " + result[i]);
-                System.out.println(result[i]);
-                avg += result[i];
-                if (result[i] < min) min = result[i];
-              }
-              avg /= result.length;
-              for (int i = 0; i < result.length; i++)
-                sd += Math.pow(Math.abs(result[i] - avg), 2);
-              sd = Math.sqrt(sd/result.length);
-              System.out.println("Aggregated result:");
-              System.out.println(avg);
-              System.out.println(min);
-              System.out.println(sd);
-            }
-          }
-        }
+      for (int i = 0; i < result.length; i++) {
+        System.out.println("*****************rep #" + i + "*************");
+        init(args);
+        GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
+           DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT);
+        // System.out.println("The best record: " + population.getRecord().toString());
+        // System.out.println("Distance: " + population.getRecord().getDistance());
+        result[i] = population.getRecord().getDistance();
+        // Inserted code for iteration:
+        String[] args_mod = new String[1];
+        args_mod[0] = args[0] + "_" + "t" + i;
+        finalize(args_mod);
       }
 
-      /*
-      for (int[] key : results.keySet()) {
-        System.out.println(Arrays.toString(key));
-        double[] result = results.get(key);
-        double avg = 0;
-        double sd = 0;
-        double min = Double.MAX_VALUE;
-        for (int i = 0; i < result.length; i++) {
-          // System.out.println("iter #" + i);
-          // System.out.println("Distance: " + result[i]);
-          // System.out.println(result[i]);
-          avg += result[i];
-          if (result[i] < min) min = result[i];
-        }
-        avg /= result.length;
-        for (int i = 0; i < result.length; i++)
-          sd += Math.pow(Math.abs(result[i] - avg), 2);
-        sd = Math.sqrt(sd);
-        System.out.println(avg);
-        System.out.println(min);
-        System.out.println(sd);
-      }
-      */
-
-      /*
+      // results.put(key, result);
+      double avg = 0;
+      double sd = 0;
+      double min = Double.MAX_VALUE;
+      System.out.println("Total results:");
       for (int i = 0; i < result.length; i++) {
         // System.out.println("iter #" + i);
         // System.out.println("Distance: " + result[i]);
         System.out.println(result[i]);
+        avg += result[i];
+        if (result[i] < min) min = result[i];
       }
-      */
+      avg /= result.length;
+      for (int i = 0; i < result.length; i++)
+        sd += Math.pow(Math.abs(result[i] - avg), 2);
+      sd = Math.sqrt(sd/result.length);
+      System.out.println("Aggregated result:");
+      System.out.println(avg);
+      System.out.println(min);
+      System.out.println(sd);
 
     }
 
@@ -198,26 +157,12 @@ public class Main {
                 break;    // end condition
               }
 
-              /*
-              if (iter > 100) {
-                System.out.println("break!");
-                break;
-              }
-              */
-
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
               Path p1 = null;
               Path p2 = null;
-              switch (selection) {
-                case ROULETTE_WHEEL_SELECTION:
-                  p1 = selection(ROULETTE_WHEEL_SELECTION);
-  //              p2 = selection(ROULETTE_WHEEL_SELECTION);
-                case TOURNAMENT_SELECTION:
-                  p1 = selection(TOURNAMENT_SELECTION);
-                  p2 = selection(TOURNAMENT_SELECTION);
-                default:
-              }
+              p1 = selection(selection);
+              p2 = selection(selection);
               /*
               System.out.println("p1: " + p1.toString()
                       + " , idx=" + p1.getIdxInPopulation()
@@ -229,39 +174,14 @@ public class Main {
 
               // 2. Crossover two paths to generate a new offspring
               Path offspring = null;
-              switch (crossover) {
-                case CYCLE_CROSSOVER:
-                  offspring = crossover(p1, p2, CYCLE_CROSSOVER);
-                case ORDER_CROSSOVER:
-                  offspring = crossover(p1, p2, ORDER_CROSSOVER);
-                case PARTIALLY_MATCHED_CROSSOVER:
-                  offspring = crossover(p1, p2, PARTIALLY_MATCHED_CROSSOVER);
-                case EDGE_RECOMBINATION:
-                  offspring = crossover(p1, p2, EDGE_RECOMBINATION);
-                default:
-              }
+              offspring = crossover(p1, p2, crossover);
               // System.out.println("offspring after crossover: " + offspring.toString());
 
               // 3. Mutate the newly generated offspring
               //    if generated [0, 1) random value exceeds
               //    the mutation probability
               if (rnd.nextDouble() < MUTATION_PROBABILITY) {
-                switch (mutation) {
-                  case DISPLACEMENT_MUTATION:
-                    offspring = mutation(offspring, DISPLACEMENT_MUTATION);
-                    break;
-                  case EXCHANGE_MUTATION:
-                    offspring = mutation(offspring, EXCHANGE_MUTATION);
-                  case INSERTION_MUTATION:
-                    offspring = mutation(offspring, INSERTION_MUTATION);
-                  case SIMPLE_INVERSION_MUTATION:
-                    offspring = mutation(offspring, SIMPLE_INVERSION_MUTATION); // TODO: Problem...
-                  case INVERSION_MUTATION:
-                    offspring = mutation(offspring, INVERSION_MUTATION);
-                  case SCRAMBLE_MUTATION:
-                    offspring = mutation(offspring, SCRAMBLE_MUTATION);
-                  default:
-                }
+                offspring = mutation(offspring, mutation);
                 // System.out.println("offspring after mutation: " + offspring.toString());
               } else {
                 // System.out.println("offspring without mutation: " + offspring.toString());
@@ -278,17 +198,7 @@ public class Main {
               }
 
               // 5. Replace one of the path in population with the new offspring
-              switch (replacement) {
-                case RANDOM_REPLACEMENT:
-                  population = replacement(offspring, RANDOM_REPLACEMENT, p1, p2);
-                case WORST_CASE_REPLACEMENT:
-                  population = replacement(offspring, WORST_CASE_REPLACEMENT, p1, p2);
-                case WORST_PARENT_REPLACEMENT:
-                  population = replacement(offspring, WORST_PARENT_REPLACEMENT, p1, p2);
-                case WORST_PARENT_CASE_REPLACEMENT:
-                  population = replacement(offspring, WORST_PARENT_CASE_REPLACEMENT, p1, p2);
-                default:
-              }
+              population = replacement(offspring, replacement, p1, p2);
               // System.out.println("current record=" + population.getRecord());
               // System.out.println("distance=" + population.getRecord().getDistance());
 
