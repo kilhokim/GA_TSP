@@ -8,10 +8,7 @@ import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
-import kim.kilho.ga.util.PointUtils;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
 public class Main {
@@ -32,7 +29,7 @@ public class Main {
     public static final int ROULETTE_WHEEL_SELECTION = 1;
       public static final double SELECTION_PRESSURE_PARAM = 3;
     public static final int TOURNAMENT_SELECTION = 2;
-      public static final double SELECTION_TOURNAMENT_T = 0.9;
+      public static final double SELECTION_TOURNAMENT_T = 0.8;
 
     // Crossover
     public static final int CYCLE_CROSSOVER = 1;
@@ -58,47 +55,18 @@ public class Main {
     // How to run:
     // $ java Main data/cycle.in
     public static void main(String[] args) {
-      final int NUM_ITERATIONS = 30;
-      // HashMap<int[], double[]> results = new HashMap<int[], double[]>();
+      final int NUM_ITERATIONS = 1;
 
       // int[] key = {se, xo, mt, rp};
       double[] result = new double[NUM_ITERATIONS];
 
       for (int i = 0; i < result.length; i++) {
-        System.out.println("*****************rep #" + i + "*************");
         init(args);
         GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
            DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT);
-        // System.out.println("The best record: " + population.getRecord().toString());
-        // System.out.println("Distance: " + population.getRecord().getDistance());
         result[i] = population.getRecord().getDistance();
-        // Inserted code for iteration:
-        String[] args_mod = new String[1];
-        args_mod[0] = args[0] + "_" + "t" + i;
-        finalize(args_mod);
+        finalize(args);
       }
-
-      // results.put(key, result);
-      double avg = 0;
-      double sd = 0;
-      double min = Double.MAX_VALUE;
-      System.out.println("Total results:");
-      for (int i = 0; i < result.length; i++) {
-        // System.out.println("iter #" + i);
-        // System.out.println("Distance: " + result[i]);
-        System.out.println(result[i]);
-        avg += result[i];
-        if (result[i] < min) min = result[i];
-      }
-      avg /= result.length;
-      for (int i = 0; i < result.length; i++)
-        sd += Math.pow(Math.abs(result[i] - avg), 2);
-      sd = Math.sqrt(sd/result.length);
-      System.out.println("Aggregated result:");
-      System.out.println(avg);
-      System.out.println(min);
-      System.out.println(sd);
-
     }
 
     /**
@@ -111,13 +79,6 @@ public class Main {
             Object[] input = fm.read(args[0], MAXN);
             points = (Point[])input[0];
             timeLimit = (Double)input[1];
-            // System.out.println("Total number of points=" + points.length);
-            for (int i = 0; i < points.length; i++) {
-                // System.out.println(points[i].toString());
-            }
-            // System.out.println("Total time limit=" + timeLimit);
-            // System.out.println(PointUtils.distance(points[0], points[1]));
-            // System.out.println(PointUtils.distance(points[1], points[2]));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -140,79 +101,42 @@ public class Main {
      */
     private static void GA(int selection, int crossover,
                            int mutation, int replacement) {
-        int iter = 0;
         long beginTime = System.currentTimeMillis()/1000;
         Random rnd = new Random();
 
         population = new PathPopulation(PSIZE, points.length);
         population.evaluateAll(points);
 
-        // System.out.println("Start GA!");
         try {
             while (true) {
-              // if (++iter % 100000 == 0)
-                // System.out.println("**********iter #" + (iter) + "************");
-              if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1) {
-                // System.out.println("break!");
+              // FIXME:
+              if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
                 break;    // end condition
-              }
 
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
-              Path p1 = null;
-              Path p2 = null;
-              p1 = selection(selection);
-              p2 = selection(selection);
-              /*
-              System.out.println("p1: " + p1.toString()
-                      + " , idx=" + p1.getIdxInPopulation()
-                      + ", distance=" + p1.getDistance());
-              System.out.println("p2: " + p2.toString()
-                      + " , idx=" + p2.getIdxInPopulation()
-                      + ", distance=" + p2.getDistance());
-                      */
+              Path p1 = selection(selection, SELECTION_TOURNAMENT_T);
+              Path p2 = selection(selection, SELECTION_TOURNAMENT_T);
 
               // 2. Crossover two paths to generate a new offspring
-              Path offspring = null;
-              offspring = crossover(p1, p2, crossover);
-              // System.out.println("offspring after crossover: " + offspring.toString());
+              Path offspring = crossover(p1, p2, crossover);
 
               // 3. Mutate the newly generated offspring
               //    if generated [0, 1) random value exceeds
               //    the mutation probability
               if (rnd.nextDouble() < MUTATION_PROBABILITY) {
                 offspring = mutation(offspring, mutation);
-                // System.out.println("offspring after mutation: " + offspring.toString());
-              } else {
-                // System.out.println("offspring without mutation: " + offspring.toString());
               }
 
               // 4. Evaluate the distance value of newly generated offspring
               //    and update the best record
               offspring.evaluate(points);
-              // System.out.println("distance of the offspring=" + offspring.getDistance());
-              if (population.getRecord().getDistance() > offspring.getDistance()) {
+              if (population.getRecord().getDistance() > offspring.getDistance())
                 population.setRecord(offspring);
-                // System.out.println("current record=" + population.getRecord());
-                // System.out.println("distance=" + population.getRecord().getDistance());
-              }
 
               // 5. Replace one of the path in population with the new offspring
               population = replacement(offspring, replacement, p1, p2);
-              // System.out.println("current record=" + population.getRecord());
-              // System.out.println("distance=" + population.getRecord().getDistance());
 
-              /*
-              if (++iter % 100000 == 0) {
-                double avgDist = 0;
-                for (int i = 0; i < population.size(); i++)
-                  avgDist += population.get(i).getDistance();
-                avgDist /= population.size();
-                System.out.println(iter + "," + avgDist + ","
-                                 + population.getRecord().getDistance()
-                                  ) ;
-              }
-              */
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,15 +150,14 @@ public class Main {
      * @exception Exception
      * @return Path
      */
-    private static Path selection(int option) throws Exception {
+    private static Path selection(int option, double selectionParam) throws Exception {
         switch(option) {
-            // 1. Roulette Wheel Selection.
             case ROULETTE_WHEEL_SELECTION:
                 return Selection.rouletteWheelSelection(population,
-                        SELECTION_PRESSURE_PARAM);
+                        selectionParam);
             case TOURNAMENT_SELECTION:
                 return Selection.tournamentSelection(population,
-                        SELECTION_TOURNAMENT_T);
+                        selectionParam);
             default:
                 throw new Exception("Invalid option param.");
         }

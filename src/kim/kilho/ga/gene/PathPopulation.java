@@ -15,8 +15,6 @@ public class PathPopulation {
     this.size = size;
     for (int i = 0; i < size; i++) {
       population[i] = new Path(length, true, i);
-      // System.out.println("------------ Path #" + i + " -----------------");
-      // System.out.println(population[i].toString());
     }
     record = population[0];
   }

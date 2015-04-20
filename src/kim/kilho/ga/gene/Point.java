@@ -4,7 +4,7 @@ package kim.kilho.ga.gene;
  * Two-dimensional point coordinates for TSP
  * @author Kilho Kim
  */
-public class Point implements Gene {
+public class Point {
   double x;
   double y;
 

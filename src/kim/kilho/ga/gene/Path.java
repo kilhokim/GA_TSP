@@ -1,17 +1,13 @@
 package kim.kilho.ga.gene;
 
-import kim.kilho.ga.exception.PathException;
 import kim.kilho.ga.util.ArrayUtils;
 import kim.kilho.ga.util.PointUtils;
 
-import java.util.Arrays;
-import java.util.Random;
 
 /**
  * A sequence of points as a solution for TSP
  * @author Kilho Kim
  */
-// TODO: public class Path implements Chromosome {
 public class Path {
   private int[] path;  // the sequence of indices of points
   private int idxInPopulation;  // the index of the path in population
