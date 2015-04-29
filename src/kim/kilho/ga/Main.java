@@ -1,9 +1,6 @@
 package kim.kilho.ga;
 
-import kim.kilho.ga.algorithm.Crossover;
-import kim.kilho.ga.algorithm.Mutation;
-import kim.kilho.ga.algorithm.Replacement;
-import kim.kilho.ga.algorithm.Selection;
+import kim.kilho.ga.algorithm.*;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.gene.Point;
@@ -62,8 +59,10 @@ public class Main {
 
       for (int i = 0; i < result.length; i++) {
         init(args);
-        GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
-           DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT);
+        // GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
+        //    DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT);
+        runTwoOpt(100);
+        System.out.println(population.getRecord().toString());
         result[i] = population.getRecord().getDistance();
         finalize(args);
       }
@@ -124,9 +123,8 @@ public class Main {
               // 3. Mutate the newly generated offspring
               //    if generated [0, 1) random value exceeds
               //    the mutation probability
-              if (rnd.nextDouble() < MUTATION_PROBABILITY) {
+              if (rnd.nextDouble() < MUTATION_PROBABILITY)
                 offspring = mutation(offspring, mutation);
-              }
 
               // 4. Evaluate the distance value of newly generated offspring
               //    and update the best record
@@ -143,6 +141,39 @@ public class Main {
         }
     }
 
+    /**
+     * Run 2-Opt algorithm.
+     * @param maxIter
+     */
+    private static void runTwoOpt(int maxIter) {
+        long beginTime = System.currentTimeMillis()/1000;
+        Random rnd = new Random();
+        int iter = 0;
+
+        // Put only a single path into population
+        population = new PathPopulation(1, points.length);
+        population.evaluateAll(points);
+        Path path;
+
+        try {
+            System.out.println("Start 2-Opt algorithm!");
+            while (true) {
+                if (++iter > maxIter)
+                    break;
+                path = population.get(0);
+                path = LocalSearch.twoOpt(path, points);
+                System.out.println("iter #" + iter + " distance=" + path.evaluate(points));
+                System.out.println("path: " + path.toString());
+                if (population.getRecord().getDistance() > path.getDistance())
+                    population.setRecord(path);
+                population.set(0, path);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     /**
      * Choose one path from the population.

@@ -67,30 +67,29 @@ public class LocalSearch {
    * @return Path
    */
   public static Path twoOpt(Path p, Point[] points) {
-    Path newP = new Path(p.getLength(), false), currP = null;
+    Path currP = null;
     boolean improved = true;
     double bestDistance = 0, newDistance = 0;
     int i, k;
 
     while (improved) {
+      // System.out.println("Start again 2-Opt");
+      improved = false;
+      bestDistance = p.getDistance();
       startAgain:
-      {
-        improved = false;
-        bestDistance = p.getDistance();
         for (i = 0; i < p.getLength()-1; i++) {
           for (k = i+1; k < p.getLength(); k++) {
             currP = twoOptSwap(p, i, k);
             newDistance = currP.evaluate(points);
             if (newDistance < bestDistance) {
-              newP = currP;
+              p = currP;
               improved = true;
               break startAgain;
             }
           }
         }
-      }
     }
 
-    return newP;
+    return p;
   }
 }
