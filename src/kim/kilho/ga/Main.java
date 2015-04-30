@@ -10,8 +10,8 @@ import java.util.Random;
 
 public class Main {
 
-    public static final int MAXN = 318; // Maximum value of N
-    public static final int PSIZE = 100;  // Size of the population
+    public static final int MAXN = 600; // Maximum value of N
+    public static final int PSIZE = 50;  // Size of the population
     // Population of solutions.
     static PathPopulation population;
     // Total array of points.
@@ -59,11 +59,11 @@ public class Main {
 
       for (int i = 0; i < result.length; i++) {
         init(args);
-        // GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
-        //    DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT);
-        runTwoOpt(100);
+        GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
+           DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT, true);
         System.out.println(population.getRecord().toString());
         result[i] = population.getRecord().getDistance();
+        System.out.println(result[i]);
         finalize(args);
       }
     }
@@ -99,18 +99,29 @@ public class Main {
      * A 'steady-state' GA
      */
     private static void GA(int selection, int crossover,
-                           int mutation, int replacement) {
+                           int mutation, int replacement,
+                           boolean localOpt) {
         long beginTime = System.currentTimeMillis()/1000;
         Random rnd = new Random();
+        int iter = 0;
 
         population = new PathPopulation(PSIZE, points.length);
         population.evaluateAll(points);
 
         try {
+            System.out.println("# of points: " + points.length);
+            System.out.println("time limit: " + timeLimit);
+            System.out.println("GA Start!");
             while (true) {
               // FIXME:
               if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
                 break;    // end condition
+
+              if (iter % 1 == 0) {
+                System.out.println("********iter #" + (iter++) + "**********");
+                System.out.println(population.getRecord().toString());
+                System.out.println(population.getRecord().getDistance());
+              }
 
               // 1. Select two paths p1 and p2 from the population
               // TODO: Duplicated parents case?
@@ -126,7 +137,10 @@ public class Main {
               if (rnd.nextDouble() < MUTATION_PROBABILITY)
                 offspring = mutation(offspring, mutation);
 
-              // 4. Evaluate the distance value of newly generated offspring
+              // 4. Do local optimization
+              offspring = runTwoOpt(offspring, points, beginTime, timeLimit);
+
+              // 5. Evaluate the distance value of newly generated offspring
               //    and update the best record
               offspring.evaluate(points);
               if (population.getRecord().getDistance() > offspring.getDistance())
@@ -143,36 +157,16 @@ public class Main {
 
     /**
      * Run 2-Opt algorithm.
-     * @param maxIter
+     * @param p
+     * @return Path
      */
-    private static void runTwoOpt(int maxIter) {
-        long beginTime = System.currentTimeMillis()/1000;
-        Random rnd = new Random();
-        int iter = 0;
-
-        // Put only a single path into population
-        population = new PathPopulation(1, points.length);
-        population.evaluateAll(points);
-        Path path;
-
-        try {
-            System.out.println("Start 2-Opt algorithm!");
-            while (true) {
-                if (++iter > maxIter)
-                    break;
-                path = population.get(0);
-                path = LocalSearch.twoOpt(path, points);
-                System.out.println("iter #" + iter + " distance=" + path.evaluate(points));
-                System.out.println("path: " + path.toString());
-                if (population.getRecord().getDistance() > path.getDistance())
-                    population.setRecord(path);
-                population.set(0, path);
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+    private static Path runTwoOpt(Path p, Point[] points,
+                                  long beginTime, double timeLimit) {
+        // System.out.println("Start 2-Opt algorithm!");
+        Path offspring = LocalSearch.twoOpt(p, points, beginTime, timeLimit);
+        // System.out.println("iter #" + iter + " distance=" + path.evaluate(points));
+        // System.out.println("path: " + path.toString());
+        return offspring;
     }
 
     /**

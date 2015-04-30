@@ -11,7 +11,7 @@ import kim.kilho.ga.gene.Point;
 public class LocalSearch {
 
   /**
-   * 2-Opt swap for a part of path (path, i, k).
+   * 2-change for a part of path (path, i, k).
    *   take route[0] to route[i-1] and add them in order to new route
    *   take route[i] to route[k] and add them in reverse order to new_route
    *   take route[k+1] to end and add them in order to new_route
@@ -21,7 +21,7 @@ public class LocalSearch {
    *   @param k
    *   @return Path
    */
-  public static Path twoOptSwap(Path p, int i, int k) {
+  public static Path twoChange(Path p, int i, int k) {
     if (i > k)
       throw new LocalSearchException("Invalid input: " +
                                      "i can't be higher than k");
@@ -53,6 +53,7 @@ public class LocalSearch {
 
   /**
    * The complete 2-opt swap algorithm.
+   * (Source: 2-Opt, Wikipedia)
    *   repeat until no improvement is made:
    *     start again:
    *     best distance = calculateTotalDistance(existing route)
@@ -66,7 +67,8 @@ public class LocalSearch {
    * @param p
    * @return Path
    */
-  public static Path twoOpt(Path p, Point[] points) {
+  public static Path twoOpt(Path p, Point[] points,
+                            long beginTime, double timeLimit) {
     Path currP = null;
     boolean improved = true;
     double bestDistance = 0, newDistance = 0;
@@ -76,14 +78,22 @@ public class LocalSearch {
       // System.out.println("Start again 2-Opt");
       improved = false;
       bestDistance = p.getDistance();
+      // TODO: Make it not to repeat from the beginning right after it gets improved
       startAgain:
         for (i = 0; i < p.getLength()-1; i++) {
           for (k = i+1; k < p.getLength(); k++) {
-            currP = twoOptSwap(p, i, k);
+            // Set emergency exit for twoOpt loop
+            // in case of timeover:
+            if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
+              return p;
+            currP = twoChange(p, i, k);
             newDistance = currP.evaluate(points);
             if (newDistance < bestDistance) {
               p = currP;
               improved = true;
+              // System.out.println(p.toString());
+              System.out.println("newDistance=" + newDistance +
+                                 ", bestDistance=" + bestDistance);
               break startAgain;
             }
           }
