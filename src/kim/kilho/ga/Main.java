@@ -60,14 +60,29 @@ public class Main {
       for (int i = 0; i < result.length; i++) {
         init(args);
         long beginTime = System.currentTimeMillis()/1000;
-        // GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
-        //    DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
-        //    beginTime, true);
-        Path p = new Path(points.length, true);
-        runTwoOpt(p, points, beginTime, timeLimit);
-        // System.out.println(population.getRecord().toString());
-        // result[i] = population.getRecord().getDistance();
-        // System.out.println(result[i]);
+        GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
+           DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
+           beginTime, true);
+        System.out.println(population.getRecord().toString());
+        result[i] = population.getRecord().getDistance();
+        System.out.println(result[i]);
+
+        /*
+          FIXME: Uncomment below to start a single 2-Opt
+          Path p = new Path(points.length, true);
+          runTwoOpt(p, points, beginTime, timeLimit);
+         */
+
+        /*
+          FIXME: Uncomment below to start a Multi-start 2-Opt
+          int reps = 10;
+          Path[] paths = new Path[reps];
+          for (int j = 0; j < reps; j++) {
+            beginTime = System.currentTimeMillis()/1000;
+            Path p = new Path(points.length, true);
+            paths[j] = runTwoOpt(p, points, beginTime, timeLimit);
+          }
+         */
         // finalize(args);
       }
     }
@@ -109,7 +124,12 @@ public class Main {
         int iter = 0;
 
         population = new PathPopulation(PSIZE, points.length);
-        population.evaluateAll(points);
+        // Do local optimization for the paths in population
+        for (int i = 0; i < PSIZE; i++) {
+          System.out.println("Optimizing path #" + i + " in population...");
+          population.set(i, runTwoOpt(population.get(i), points, beginTime, timeLimit));
+        }
+        // population.evaluateAll(points);
 
         try {
             System.out.println("# of points: " + points.length);

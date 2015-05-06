@@ -95,8 +95,8 @@ public class LocalSearch {
               p = currP;
               improved = true;
               // System.out.println(p.toString());
-              System.out.println("newDistance=" + newDistance +
-                                 ", bestDistance=" + bestDistance);
+              // System.out.println("newDistance=" + newDistance +
+                                 // ", bestDistance=" + bestDistance);
               break startAgain;
             }
           }
