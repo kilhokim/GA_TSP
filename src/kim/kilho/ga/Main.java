@@ -59,12 +59,16 @@ public class Main {
 
       for (int i = 0; i < result.length; i++) {
         init(args);
-        GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
-           DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT, true);
-        System.out.println(population.getRecord().toString());
-        result[i] = population.getRecord().getDistance();
-        System.out.println(result[i]);
-        finalize(args);
+        long beginTime = System.currentTimeMillis()/1000;
+        // GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
+        //    DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
+        //    beginTime, true);
+        Path p = new Path(points.length, true);
+        runTwoOpt(p, points, beginTime, timeLimit);
+        // System.out.println(population.getRecord().toString());
+        // result[i] = population.getRecord().getDistance();
+        // System.out.println(result[i]);
+        // finalize(args);
       }
     }
 
@@ -100,8 +104,7 @@ public class Main {
      */
     private static void GA(int selection, int crossover,
                            int mutation, int replacement,
-                           boolean localOpt) {
-        long beginTime = System.currentTimeMillis()/1000;
+                           long beginTime, boolean localOpt) {
         Random rnd = new Random();
         int iter = 0;
 
@@ -164,8 +167,8 @@ public class Main {
                                   long beginTime, double timeLimit) {
         // System.out.println("Start 2-Opt algorithm!");
         Path offspring = LocalSearch.twoOpt(p, points, beginTime, timeLimit);
-        // System.out.println("iter #" + iter + " distance=" + path.evaluate(points));
-        // System.out.println("path: " + path.toString());
+        // System.out.println("path: " + offspring.toString());
+        // System.out.println(offspring.getDistance());
         return offspring;
     }
 

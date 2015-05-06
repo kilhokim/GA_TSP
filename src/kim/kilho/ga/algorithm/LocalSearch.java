@@ -48,7 +48,8 @@ public class LocalSearch {
       newPath[j] = p.getPoint(j);
 
     newP.setPath(newPath);
-    newP.localUpdate(i, k, points);
+    newP.setDistance(p.getDistance());
+    newP.reEvaluate(i, k, points);
     return newP;
   }
 
@@ -89,6 +90,7 @@ public class LocalSearch {
               return p;
             currP = twoChange(p, i, k, points);
             newDistance = currP.getDistance();
+            // newDistance = currP.evaluate(points);
             if (newDistance < bestDistance) {
               p = currP;
               improved = true;

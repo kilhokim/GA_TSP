@@ -17,6 +17,7 @@ public class Path {
   public Path(int maxLength, boolean randomGeneration) {
     length = maxLength;
 
+    path = null;
     // Initialize path as a random order-based path
     // if randomGeneration is checked true.
     if (randomGeneration) {
@@ -25,7 +26,7 @@ public class Path {
       // System.out.println("newly generated path=" + Arrays.toString(path));
     }
     // Initialize distance as the maximum value.
-    distance = 1e100;
+    distance = Double.MAX_VALUE;
     // Newly generated path's index in population has not assigned yet.
     idxInPopulation = -1;
   }
@@ -33,6 +34,7 @@ public class Path {
   public Path(int maxLength, boolean randomGeneration, int idxInPopulation) {
     length = maxLength;
 
+    path = null;
     // Initialize path as a random order-based path
     // if randomGeneration is checked true.
     if (randomGeneration) {
@@ -41,7 +43,7 @@ public class Path {
       // System.out.println("newly generated path #" + idxInPopulation + "=" + Arrays.toString(path));
     }
     // Initialize distance as the maximum value.
-    distance = 1e100;
+    distance = Double.MAX_VALUE;
     this.idxInPopulation = idxInPopulation;
   }
 
@@ -98,13 +100,20 @@ public class Path {
   }
 
   // Re-evaluate and update the distance of the path only for the swapped part.
-  public double localUpdate(int i, int k, Point[] points) {
+  public double reEvaluate(int i, int k, Point[] points) {
+    // NOTE: If the distance is MAX_VALUE, the current path must be evaluated
+    // at the very first time
+    if (distance == Double.MAX_VALUE)
+      distance = evaluate(points);
+
     // Subtract the original distance of disconnected edges
-    distance -= PointUtils.distance(points[getPoint(i-1)], points[getPoint(k)]);
+    distance -= PointUtils.distance(points[getPoint((i-1+getLength())%getLength())],
+                    points[getPoint(k)]);
     distance -= PointUtils.distance(points[getPoint(i)],
                     points[getPoint((k+1) % getLength())]);
     // Add the distance of newly replaced edges
-    distance += PointUtils.distance(points[getPoint(i-1)], points[getPoint(i)]);
+    distance += PointUtils.distance(points[getPoint((i-1+getLength())%getLength())],
+                    points[getPoint(i)]);
     distance += PointUtils.distance(points[getPoint(k)],
                     points[getPoint((k+1) % getLength())]);
 

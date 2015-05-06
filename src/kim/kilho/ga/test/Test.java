@@ -28,7 +28,7 @@ public class Test {
     p.setPath(arr1);
     System.out.println("p: " + p.toString());
 
-    Path newP = LocalSearch.twoChange(p, 3, 6);
+    Path newP = LocalSearch.twoChange(p, 3, 6, null);
     System.out.println("newP: " + newP.toString());
   }
 
