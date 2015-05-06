@@ -21,7 +21,7 @@ public class LocalSearch {
    *   @param k
    *   @return Path
    */
-  public static Path twoChange(Path p, int i, int k) {
+  public static Path twoChange(Path p, int i, int k, Point[] points) {
     if (i > k)
       throw new LocalSearchException("Invalid input: " +
                                      "i can't be higher than k");
@@ -48,6 +48,7 @@ public class LocalSearch {
       newPath[j] = p.getPoint(j);
 
     newP.setPath(newPath);
+    newP.localUpdate(i, k, points);
     return newP;
   }
 
@@ -86,8 +87,8 @@ public class LocalSearch {
             // in case of timeover:
             if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
               return p;
-            currP = twoChange(p, i, k);
-            newDistance = currP.evaluate(points);
+            currP = twoChange(p, i, k, points);
+            newDistance = currP.getDistance();
             if (newDistance < bestDistance) {
               p = currP;
               improved = true;

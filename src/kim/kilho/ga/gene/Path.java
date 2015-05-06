@@ -91,8 +91,22 @@ public class Path {
     for (int i = 0; i < getLength(); i++) {
       // System.out.println("points[getPointAt(i)]=" + points[getPointAt(i)]);
       distance += PointUtils.distance(points[getPoint(i)],
-              points[getPoint((i+1) % getLength())]);
+                    points[getPoint((i+1) % getLength())]);
     }
+
+    return distance;
+  }
+
+  // Re-evaluate and update the distance of the path only for the swapped part.
+  public double localUpdate(int i, int k, Point[] points) {
+    // Subtract the original distance of disconnected edges
+    distance -= PointUtils.distance(points[getPoint(i-1)], points[getPoint(k)]);
+    distance -= PointUtils.distance(points[getPoint(i)],
+                    points[getPoint((k+1) % getLength())]);
+    // Add the distance of newly replaced edges
+    distance += PointUtils.distance(points[getPoint(i-1)], points[getPoint(i)]);
+    distance += PointUtils.distance(points[getPoint(k)],
+                    points[getPoint((k+1) % getLength())]);
 
     return distance;
   }
