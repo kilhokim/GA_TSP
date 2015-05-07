@@ -7,6 +7,7 @@ import kim.kilho.ga.gene.Point;
 
 import java.io.*;
 import java.text.NumberFormat;
+import java.util.Arrays;
 
 /**
  * The manager class which provides the following functions:
@@ -35,8 +36,9 @@ public class FileManager {
     int i;  // iteration variable
     String[] coordinates;  // save line which is read during iteration as coordinates
     BufferedReader br = null;
-    Point[] points;
-    Object[] output = new Object[2];
+    // Point[] points;
+    double[] pX, pY;
+    Object[] output = new Object[3];
 
     // Generate a new file reader
     // throw IOException for the following line:
@@ -54,14 +56,18 @@ public class FileManager {
     }
 
     // Get every point from each lines and add it to path,
-    points = new Point[numPoints];
+    pX = new double[numPoints];
+    pY = new double[numPoints];
+    // points = new Point[numPoints];
     for (i = 0; i < numPoints; i++) {
       coordinates = br.readLine().split(" ");
       // if coordinates' dimension isn't two, throw InvalidInputException.
       if (coordinates.length != 2)
         throw new InvalidInputException("Invalid input for point coordinates");
-      points[i] = new Point(Double.parseDouble(coordinates[0]),
-                         Double.parseDouble(coordinates[1]));
+      pX[i] = Double.parseDouble(coordinates[0]);
+      pY[i] = Double.parseDouble(coordinates[1]);
+      // points[i] = new Point(Double.parseDouble(coordinates[0]),
+      //                Double.parseDouble(coordinates[1]));
     }
 
     // Get the total available time from the last line,
@@ -73,8 +79,10 @@ public class FileManager {
     }
     br.close();
 
-    output[0] = points;
-    output[1] = availableTime;
+    // output[0] = points;
+    output[0] = pX;
+    output[1] = pY;
+    output[2] = availableTime;
 
     return output;
   }
@@ -83,7 +91,7 @@ public class FileManager {
    * Write the best result to file.
    * @param inputFileName
    */
-  public void write(String inputFileName, Path path) throws IOException {
+  public void write(String inputFileName, int[] path) throws IOException {
     // Building the output filename from the input filename.
     StringBuilder outputFileName = new StringBuilder();
     String[] inputFilePaths = inputFileName.split("/");
@@ -107,7 +115,7 @@ public class FileManager {
     // Generate a new file writer
     // throw IOException for the following line:
     bw = new BufferedWriter(new FileWriter(outputFileName.toString()));
-    bw.write(path.toString());
+    bw.write(Arrays.toString(path));
     bw.close();
   }
 

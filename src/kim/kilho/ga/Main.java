@@ -13,10 +13,18 @@ public class Main {
 
     public static final int MAXN = 600; // Maximum value of N
     public static final int PSIZE = 50;  // Size of the population
+
     // Population of solutions.
-    static PathPopulation population;
+    static int[][] population;
+
+    // Best records in the population.
+    static int[] bestPath;
+    static double record;
+
     // Total array of points.
-    static Point[] points = null;
+    static double[] pX, pY;
+    static double[][] dist;
+
     // Time limit for the test case
     static double timeLimit;
 
@@ -59,8 +67,8 @@ public class Main {
       double[] result = new double[NUM_ITERATIONS];
 
       for (int i = 0; i < result.length; i++) {
-        init(args);
         long beginTime = System.currentTimeMillis()/1000;
+        init(args);
         GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
            DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
            beginTime, true);
@@ -96,9 +104,17 @@ public class Main {
         fm = new FileManager();
         try {
             Object[] input = fm.read(args[0], MAXN);
-            points = (Point[])input[0];
-            timeLimit = (Double)input[1];
-            PointUtils.calculate(points);
+            // points = (Point[])input[0];
+            pX = (double[])input[0];
+            pY = (double[])input[1];
+            timeLimit = (Double)input[2];
+            dist = new double[pX.length][pX.length];
+            for (int i = 0; i < pX.length; i++) {
+              for (int j = 0; j < pX.length; j++) {
+                dist[i][j] = Math.sqrt(Math.pow(pX[i] - pX[j], 2)
+                        + Math.pow(pY[i] - pY[j], 2));
+              }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -110,7 +126,7 @@ public class Main {
      */
     private static void finalize(String[] args) {
       try {
-        fm.write(args[0], population.getRecord());
+        fm.write(args[0], bestPath);
       } catch (Exception e) {
         e.printStackTrace();
       }
