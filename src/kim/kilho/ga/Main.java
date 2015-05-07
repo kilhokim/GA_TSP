@@ -5,6 +5,7 @@ import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
+import kim.kilho.ga.util.PointUtils;
 
 import java.util.Random;
 
@@ -97,6 +98,7 @@ public class Main {
             Object[] input = fm.read(args[0], MAXN);
             points = (Point[])input[0];
             timeLimit = (Double)input[1];
+            PointUtils.calculate(points);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -129,6 +131,7 @@ public class Main {
           System.out.println("Optimizing path #" + i + " in population...");
           population.set(i, runTwoOpt(population.get(i), points, beginTime, timeLimit));
         }
+        System.exit(0);
         // population.evaluateAll(points);
 
         try {
@@ -161,7 +164,8 @@ public class Main {
                 offspring = mutation(offspring, mutation);
 
               // 4. Do local optimization
-              offspring = runTwoOpt(offspring, points, beginTime, timeLimit);
+              if (localOpt)
+                offspring = runTwoOpt(offspring, points, beginTime, timeLimit);
 
               // 5. Evaluate the distance value of newly generated offspring
               //    and update the best record

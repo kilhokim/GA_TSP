@@ -48,8 +48,8 @@ public class LocalSearch {
       newPath[j] = p.getPoint(j);
 
     newP.setPath(newPath);
-    newP.setDistance(p.getDistance());
-    newP.reEvaluate(i, k, points);
+    newP.setDistance(p.reEvaluate(i, k, points));
+    // System.out.println("newP.reEvaluate(): " + newP.reEvaluate(i, k, points));
     return newP;
   }
 
@@ -71,37 +71,45 @@ public class LocalSearch {
    */
   public static Path twoOpt(Path p, Point[] points,
                             long beginTime, double timeLimit) {
-    Path currP = null;
     boolean improved = true;
     double bestDistance = 0, newDistance = 0;
     int i, k;
+    int miniChange = 0;
+    int count = 0;
+
+    // NOTE: The current path must be evaluated at the very first time.
+    p.evaluate(points);
 
     while (improved) {
+      // TODO: Make it not to repeat from the beginning right after it gets improved
       // System.out.println("Start again 2-Opt");
       improved = false;
       bestDistance = p.getDistance();
-      // TODO: Make it not to repeat from the beginning right after it gets improved
-      startAgain:
-        for (i = 0; i < p.getLength()-1; i++) {
-          for (k = i+1; k < p.getLength(); k++) {
-            // Set emergency exit for twoOpt loop
-            // in case of timeover:
-            if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
-              return p;
-            currP = twoChange(p, i, k, points);
-            newDistance = currP.getDistance();
-            // newDistance = currP.evaluate(points);
-            if (newDistance < bestDistance) {
-              p = currP;
-              improved = true;
-              // System.out.println(p.toString());
-              // System.out.println("newDistance=" + newDistance +
-                                 // ", bestDistance=" + bestDistance);
-              break startAgain;
-            }
+      restart:
+      for (i = 0; i < p.getLength()-1; i++) {
+        for (k = i+1; k < p.getLength()-1; k++) {
+          count++;
+          // Set emergency exit for twoOpt loop
+          // in case of timeover:
+          if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
+            return p;
+          newDistance = p.reEvaluate(i, k, points);
+          if (newDistance < bestDistance) {
+            // FIXME: If the difference is lower than #, just break the loop
+            if (bestDistance - newDistance < 0.0000001) miniChange++;
+            if (miniChange > 10000) break restart;
+            p = twoChange(p, i, k, points);
+            improved = true;
+            /*
+            System.out.println("newDistance=" + newDistance +
+                    ", bestDistance=" + bestDistance);
+                    */
+            break restart;
           }
         }
+      }
     }
+    System.out.println(count);
 
     return p;
   }

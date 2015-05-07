@@ -86,15 +86,16 @@ public class Path {
     return path[idx];
   }
 
+  // Set the idx'th point in the path.
+  public void setPoint(int idx, int pt) {
+    path[idx] = pt;
+  }
+
   // Calculate the distance of the path.
   public double evaluate(Point[] points) {
     distance = 0;
-    // System.out.println("getLength()=" + getLength());
-    for (int i = 0; i < getLength(); i++) {
-      // System.out.println("points[getPointAt(i)]=" + points[getPointAt(i)]);
-      distance += PointUtils.distance(points[getPoint(i)],
-                    points[getPoint((i+1) % getLength())]);
-    }
+    for (int i = 0; i < getLength(); i++)
+      distance += PointUtils.distance(getPoint(i), getPoint((i+1) % getLength()));
 
     return distance;
   }
@@ -106,18 +107,20 @@ public class Path {
     if (distance == Double.MAX_VALUE)
       distance = evaluate(points);
 
-    // Subtract the original distance of disconnected edges
-    distance -= PointUtils.distance(points[getPoint((i-1+getLength())%getLength())],
-                    points[getPoint(k)]);
-    distance -= PointUtils.distance(points[getPoint(i)],
-                    points[getPoint((k+1) % getLength())]);
-    // Add the distance of newly replaced edges
-    distance += PointUtils.distance(points[getPoint((i-1+getLength())%getLength())],
-                    points[getPoint(i)]);
-    distance += PointUtils.distance(points[getPoint(k)],
-                    points[getPoint((k+1) % getLength())]);
+    double newDistance = distance;
 
-    return distance;
+    // Subtract the original distance of disconnected edges
+    newDistance -= PointUtils.distance(getPoint((i-1+getLength())%getLength()),
+                      getPoint(k));
+    newDistance -= PointUtils.distance(getPoint(i),
+                      getPoint((k+1) % getLength()));
+    // Add the distance of newly replaced edges
+    newDistance += PointUtils.distance(getPoint((i-1+getLength())%getLength()),
+                      getPoint(i));
+    newDistance += PointUtils.distance(getPoint(k),
+                      getPoint((k+1) % getLength()));
+
+    return newDistance;
   }
 
   // String representation of the path.
