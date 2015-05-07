@@ -1,9 +1,7 @@
 package kim.kilho.ga.util;
 
-import kim.kilho.ga.exception.InvalidParamException;
+// import kim.kilho.ga.exception.InvalidParamException;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -20,7 +18,7 @@ public final class ArrayUtils {
    * @return int[]
    */
   public static int[] genRandomIntegers(int start, int end) {
-    if (start > end) throw new InvalidParamException("Invalid parameter: start, end");
+    //if (start > end) throw new InvalidParamException("Invalid parameter: start, end");
     int[] output = new int[end-start];
     int i;
     Random rnd = new Random();
@@ -45,9 +43,8 @@ public final class ArrayUtils {
    * @param end
    * @return int[]
    */
-  public static int[] genRandomIntegers(int start, int end, int num)
-          throws InvalidParamException {
-    if (num > end-start) throw new InvalidParamException("Invalid parameter: num");
+  public static int[] genRandomIntegers(int start, int end, int num) {
+    // if (num > end-start) throw new InvalidParamException("Invalid parameter: num");
 
     int[] randomInts = genRandomIntegers(start, end);
     int[] output = new int[num];

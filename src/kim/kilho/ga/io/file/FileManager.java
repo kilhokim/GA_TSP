@@ -1,9 +1,9 @@
 package kim.kilho.ga.io.file;
 
-import kim.kilho.ga.exception.InvalidInputException;
-import kim.kilho.ga.exception.PathException;
-import kim.kilho.ga.gene.Path;
-import kim.kilho.ga.gene.Point;
+// import kim.kilho.ga.exception.InvalidInputException;
+// import kim.kilho.ga.exception.PathException;
+// import kim.kilho.ga.gene.Path;
+// import kim.kilho.ga.gene.Point;
 
 import java.io.*;
 import java.text.NumberFormat;
@@ -26,13 +26,11 @@ public class FileManager {
    * @param fileName
    * @return Path
    * @throws IOException
-   * @throws InvalidInputException
-   * @throws PathException
    */
   public Object[] read(String fileName, int maxN)
-          throws IOException, InvalidInputException, PathException {
-    int numPoints;
-    double availableTime;
+          throws IOException {
+    int numPoints = 0;
+    double availableTime = 0.0;
     int i;  // iteration variable
     String[] coordinates;  // save line which is read during iteration as coordinates
     BufferedReader br = null;
@@ -49,10 +47,10 @@ public class FileManager {
       // catch & throw NumberFormatException for the following line:
       numPoints = Integer.parseInt(br.readLine());
     } catch (NumberFormatException e) {
-      throw new InvalidInputException("Invalid input for the number of points.");
+      // throw new InvalidInputException("Invalid input for the number of points.");
     }
     if (numPoints < 1 || numPoints > maxN) {
-      throw new InvalidInputException("Invalid input for the number of points.");
+      // throw new InvalidInputException("Invalid input for the number of points.");
     }
 
     // Get every point from each lines and add it to path,
@@ -63,7 +61,7 @@ public class FileManager {
       coordinates = br.readLine().split(" ");
       // if coordinates' dimension isn't two, throw InvalidInputException.
       if (coordinates.length != 2)
-        throw new InvalidInputException("Invalid input for point coordinates");
+        // throw new InvalidInputException("Invalid input for point coordinates");
       pX[i] = Double.parseDouble(coordinates[0]);
       pY[i] = Double.parseDouble(coordinates[1]);
       // points[i] = new Point(Double.parseDouble(coordinates[0]),
@@ -75,7 +73,7 @@ public class FileManager {
       // catch & throw NumberFormatException for the following line:
       availableTime = Double.parseDouble(br.readLine());
     } catch (NumberFormatException e) {
-      throw new InvalidInputException("Invalid input for the available time.");
+      // throw new InvalidInputException("Invalid input for the available time.");
     }
     br.close();
 

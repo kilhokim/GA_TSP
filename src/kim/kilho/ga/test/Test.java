@@ -1,5 +1,6 @@
 package kim.kilho.ga.test;
 
+/*
 import kim.kilho.ga.algorithm.Crossover;
 import kim.kilho.ga.algorithm.LocalSearch;
 import kim.kilho.ga.algorithm.Mutation;
@@ -8,6 +9,7 @@ import kim.kilho.ga.util.ArrayUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+*/
 
 /**
  * Test class, only for test-purpose
@@ -19,9 +21,10 @@ public class Test {
 
     // crossoverTest();
     // mutationTest();
-    localSearchTest();
+    // localSearchTest();
   }
 
+  /*
   public static void localSearchTest() {
     Path p = new Path(8, true);
     int[] arr1 = {0,1,2,3,4,5,6,7};
@@ -53,4 +56,5 @@ public class Test {
     Path offspring = Mutation.scrambleMutation(p1);
     System.out.println("offspring: " + offspring.toString());
   }
+  */
 }
