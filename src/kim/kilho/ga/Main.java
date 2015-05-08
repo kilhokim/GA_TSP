@@ -18,7 +18,7 @@ public class Main {
     // Distances for each path.
     static double[] distance;
     // Best records in the population.
-    static int[] bestPath;
+    static int[] recordPath;
     static double record;
 
     // Total array of points.
@@ -61,19 +61,22 @@ public class Main {
     // How to run:
     // $ java Main data/cycle.in
     public static void main(String[] args) {
-      final int NUM_ITERATIONS = 1;
+      final int NUM_ITERATIONS = 20;
 
       // int[] key = {se, xo, mt, rp};
       double[] result = new double[NUM_ITERATIONS];
+      int[][] resultPath = new int[NUM_ITERATIONS][];
 
       for (int i = 0; i < result.length; i++) {
+        System.out.println("************ iter #" + i + " ***************");
         long beginTime = System.currentTimeMillis()/ROUNDNUM;
         init(args);
         GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
            DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
            beginTime, true);
-        System.out.println(Arrays.toString(bestPath));
         result[i] = record;
+        resultPath[i] = recordPath;
+        System.out.println(Arrays.toString(resultPath[i]));
         System.out.println(result[i]);
 
         /*
@@ -92,8 +95,13 @@ public class Main {
             ps[j] = runTwoOpt(p, points, beginTime, timeLimit);
           }
          */
-        // finalize(args);
+        finalize(args);
       }
+
+      for (int i = 0; i < result.length; i++)
+        System.out.println(result[i]);
+      for (int i = 0; i < result.length; i++)
+        System.out.println(Arrays.toString(resultPath[i]));
     }
 
     /**
@@ -130,7 +138,7 @@ public class Main {
      */
     private static void finalize(String[] args) {
       try {
-        fm.write(args[0], bestPath);
+        fm.write(args[0], recordPath);
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -154,7 +162,7 @@ public class Main {
           distance[i] = evaluate(population[i]);
           if (distance[i] < record) {
             record = distance[i];
-            bestPath = population[i];
+            recordPath = population[i];
           }
           // System.out.println(Arrays.toString(population[i]));
         }
@@ -167,32 +175,36 @@ public class Main {
 
         // Do local optimization for the ps in population
         for (int i = 0; i < population.length; i++) {
-          System.out.println("Optimizing p #" + i + " in population...");
+          // System.out.println("Optimizing p #" + i + " in population...");
           population[i] = twoOpt(population[i], beginTime, timeLimit);
           distance[i] = evaluate(population[i]);
           // System.out.println(Arrays.toString(population[i]));
-          System.out.println(distance[i]);
+          // System.out.println(distance[i]);
           if (distance[i] < record) {
             record = distance[i];
-            bestPath = population[i];
+            recordPath = population[i];
           }
         }
         // population.evaluateAll(points);
 
         try {
+            /*
             System.out.println("# of points: " + pX.length);
             System.out.println("time limit: " + timeLimit);
             System.out.println("GA Start!");
+            */
             while (true) {
               // FIXME:
               if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
                 break;    // end condition
 
+              /*
               if (iter % 1 == 0) {
                 System.out.println("********iter #" + (iter++) + "**********");
-                System.out.println(Arrays.toString(bestPath));
+                System.out.println(Arrays.toString(recordPath));
                 System.out.println(record);
               }
+              */
 
               // 1. Select two ps p1 and p2 from the population
               // TODO: Duplicated parents case?
@@ -223,7 +235,7 @@ public class Main {
               //    and update the best record
               double offspringDist = evaluate(offspring);
               if (record > offspringDist) {
-                bestPath = offspring;
+                recordPath = offspring;
                 record = offspringDist;
               }
 
@@ -340,7 +352,7 @@ public class Main {
     public static int[] twoOpt(int[] p, long beginTime, double timeLimit) {
       int[] newP = new int[p.length];
       boolean improved = true;
-      double bestDistance = 0, distanceGain = 0, newDistance = 0;
+      double distanceGain = 0;
       int i, k, j;
       int count = 0;
 
@@ -352,52 +364,17 @@ public class Main {
         restart:
         for (i = 0; i < pX.length-1; i++) {
           for (k = i+1; k < pX.length-1; k++) {
-            /*
-            try {
-              Thread.sleep(10);
-            } catch (InterruptedException e) {
-              e.printStackTrace();
-            }
-            */
             count++;
             // Set emergency exit for twoOpt loop
             // in case of timeover:
             if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
               return p;
-            // bestDistance = evaluate(p);
             distanceGain = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]]
                         - (dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]]);
-            // bestDistance = dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]];
-            // newDistance = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]];
-            // newP = twoChange(p, i, k);
-            // newDistance = evaluate(newP);
-            // distanceGain = distanceGain(p, i, k);
             if (distanceGain < 0) {
-            // if (newDistance < bestDistance) {
-              // FIXME: If the difference is lower than #, just break the loop
-              // if (bestDistance - newDistance < 0.0000001) miniChange++;
-              // if (miniChange > 10000) break restart;
-
-              /*
-              // Take route[0] to route[i-1]
-              // and add them in order to new route:
-              for (j = 0; j < i; j++)
-                newP[j] = p[j];
-              // Take route[i] to route[k]
-              // and add them in reverse order to new_route:
-              for (j = i; j <= k; j++)
-                newP[j] = p[k - (j - i)];
-              // Take route[k+1] to end and add them in order to new_route
-              for (j = k+1; j < p.length; j++)
-                newP[j] = p[j];
-              */
-
-              // p = newP;
-              // for (int j = 0; j < p.length; j++) p[j] = newP[j];
               p = twoChange(p, i, k);
               improved = true;
 
-              // System.out.println("distanceGain=" + distanceGain + ", newDistance=" + evaluate(newP) + ", bestDistance=" + bestDistance);
               // System.out.println("i: " + i + ", k: " + k);
               // System.out.println(Arrays.toString(p));
               // System.out.println("newDistance=" + newDistance + ", bestDistance=" + bestDistance);
@@ -407,7 +384,7 @@ public class Main {
           }
         }
       }
-      System.out.println(count);
+      // System.out.println(count);
 
       return p;
     }

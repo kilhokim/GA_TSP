@@ -113,6 +113,8 @@ public class FileManager {
     // Generate a new file writer
     // throw IOException for the following line:
     bw = new BufferedWriter(new FileWriter(outputFileName.toString()));
+    // NOTE: Convert 0-base notation to 1-base notation.
+    for (int i = 0; i < path.length; i++) path[i] += 1;
     bw.write(Arrays.toString(path));
     bw.close();
   }
