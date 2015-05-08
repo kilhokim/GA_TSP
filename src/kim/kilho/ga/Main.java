@@ -113,7 +113,7 @@ public class Main {
               for (int j = 0; j < pX.length; j++) {
                 dist[i][j] = Math.sqrt((pX[i]-pX[j])*(pX[i]-pX[j])
                                      + (pY[i]-pY[j])*(pY[i]-pY[j]));
-                dist[i][j] = (double)Math.round(dist[i][j]*ROUNDNUM)/ROUNDNUM;
+                // dist[i][j] = (double)Math.round(dist[i][j]*ROUNDNUM)/ROUNDNUM;
 
                 // dist[i][j] = Math.sqrt(Math.pow(pX[i] - pX[j], 2)
                         // + Math.pow(pY[i] - pY[j], 2));
@@ -147,21 +147,35 @@ public class Main {
 
         population = new int[PSIZE][pX.length];
         distance = new double[population.length];
+        record = Double.MAX_VALUE;
         // Generate random order-based ps in the population.
         for (int i = 0; i < population.length; i++) {
           population[i] = ArrayUtils.genRandomIntegers(0, pX.length);
           distance[i] = evaluate(population[i]);
+          if (distance[i] < record) {
+            record = distance[i];
+            bestPath = population[i];
+          }
           // System.out.println(Arrays.toString(population[i]));
         }
         // record = Double.MAX_VALUE;
 
+        /*
         for (int i = 0; i < dist.length; i++)
           System.out.println(Arrays.toString(dist[i]));
+        */
 
         // Do local optimization for the ps in population
         for (int i = 0; i < population.length; i++) {
           System.out.println("Optimizing p #" + i + " in population...");
-          population[i] = runTwoOpt(population[i], beginTime, timeLimit);
+          population[i] = twoOpt(population[i], beginTime, timeLimit);
+          distance[i] = evaluate(population[i]);
+          // System.out.println(Arrays.toString(population[i]));
+          System.out.println(distance[i]);
+          if (distance[i] < record) {
+            record = distance[i];
+            bestPath = population[i];
+          }
         }
         // population.evaluateAll(points);
 
@@ -231,7 +245,8 @@ public class Main {
       for (int i = 0; i < p.length; i++)
         distance += dist[p[i]][p[(i+1)%p.length]];
 
-      return (double)Math.round(distance*ROUNDNUM)/ROUNDNUM;
+      return distance;
+      // return (double)Math.round(distance*ROUNDNUM)/ROUNDNUM;
     }
 
     /**
@@ -249,7 +264,8 @@ public class Main {
       // return distance;
       double gain = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]]
                  - (dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]]);
-      return (double)Math.round(gain*ROUNDNUM)/ROUNDNUM;
+      return gain;
+      // return (double)Math.round(gain*ROUNDNUM)/ROUNDNUM;
     }
 
 
@@ -322,43 +338,70 @@ public class Main {
      * @return Path
      */
     public static int[] twoOpt(int[] p, long beginTime, double timeLimit) {
-      int[] newP;
+      int[] newP = new int[p.length];
       boolean improved = true;
-      double bestDistance = 0, distanceGain = 0;
-      int i, k;
+      double bestDistance = 0, distanceGain = 0, newDistance = 0;
+      int i, k, j;
       int count = 0;
 
       while (improved) {
         // TODO: Make it not to repeat from the beginning right after it gets improved
         // System.out.println("Start again 2-Opt");
         improved = false;
-        bestDistance = evaluate(p);
+        // bestDistance = evaluate(p);
         restart:
         for (i = 0; i < pX.length-1; i++) {
-          for (k = i+1; k < pX.length; k++) {
+          for (k = i+1; k < pX.length-1; k++) {
+            /*
+            try {
+              Thread.sleep(10);
+            } catch (InterruptedException e) {
+              e.printStackTrace();
+            }
+            */
             count++;
             // Set emergency exit for twoOpt loop
             // in case of timeover:
             if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
               return p;
             // bestDistance = evaluate(p);
+            distanceGain = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]]
+                        - (dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]]);
             // bestDistance = dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]];
             // newDistance = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]];
             // newP = twoChange(p, i, k);
             // newDistance = evaluate(newP);
-            distanceGain = distanceGain(p, i, k);
+            // distanceGain = distanceGain(p, i, k);
             if (distanceGain < 0) {
+            // if (newDistance < bestDistance) {
               // FIXME: If the difference is lower than #, just break the loop
               // if (bestDistance - newDistance < 0.0000001) miniChange++;
               // if (miniChange > 10000) break restart;
-              newP = twoChange(p, i, k);
-              p = newP;
+
+              /*
+              // Take route[0] to route[i-1]
+              // and add them in order to new route:
+              for (j = 0; j < i; j++)
+                newP[j] = p[j];
+              // Take route[i] to route[k]
+              // and add them in reverse order to new_route:
+              for (j = i; j <= k; j++)
+                newP[j] = p[k - (j - i)];
+              // Take route[k+1] to end and add them in order to new_route
+              for (j = k+1; j < p.length; j++)
+                newP[j] = p[j];
+              */
+
+              // p = newP;
               // for (int j = 0; j < p.length; j++) p[j] = newP[j];
-              // p = twoChange(p, i, k);
+              p = twoChange(p, i, k);
               improved = true;
 
-              System.out.println("distanceGain=" + distanceGain + ", newDistance=" + evaluate(newP) +
-                      ", bestDistance=" + bestDistance);
+              // System.out.println("distanceGain=" + distanceGain + ", newDistance=" + evaluate(newP) + ", bestDistance=" + bestDistance);
+              // System.out.println("i: " + i + ", k: " + k);
+              // System.out.println(Arrays.toString(p));
+              // System.out.println("newDistance=" + newDistance + ", bestDistance=" + bestDistance);
+              // System.out.println("newDistance=" + evaluate(p) + ", bestDistance=" + bestDistance);
               break restart;
             }
           }
@@ -609,6 +652,7 @@ public class Main {
             */
             case WORST_PARENT_CASE_REPLACEMENT:
                 worstParentCaseReplacement(p, p1, p2, p1Idx, p2Idx);
+                break;
             default:
                 throw new Exception("Invalid option param.");
         }

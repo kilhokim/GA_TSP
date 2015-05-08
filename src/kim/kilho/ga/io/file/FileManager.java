@@ -60,7 +60,7 @@ public class FileManager {
     for (i = 0; i < numPoints; i++) {
       coordinates = br.readLine().split(" ");
       // if coordinates' dimension isn't two, throw InvalidInputException.
-      if (coordinates.length != 2)
+      // if (coordinates.length != 2)
         // throw new InvalidInputException("Invalid input for point coordinates");
       pX[i] = Double.parseDouble(coordinates[0]);
       pY[i] = Double.parseDouble(coordinates[1]);
