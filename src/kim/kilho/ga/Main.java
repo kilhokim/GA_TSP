@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Random;
 
 public class Main {
-    public static final int ROUNDNUM = 1000;
 
     public static final int MAXN = 600; // Maximum value of N
     public static final int PSIZE = 50;  // Size of the population
@@ -25,8 +24,19 @@ public class Main {
     static double[] pX, pY;
     static double[][] dist;
 
+    // The number of generations.
+    static int numGenerations;
+
+    // The number of local optimizations.
+    static int numTwoOpts;
+
     // Time limit for the test case
     static double timeLimit;
+
+    // ArrayLists for tracking the minimum distance
+    // and average distance by generations
+    // static double[] minDist;
+    // static double[] avgDist;
 
     static FileManager fm;
 
@@ -62,46 +72,99 @@ public class Main {
     // $ java Main data/cycle.in
     public static void main(String[] args) {
       final int NUM_ITERATIONS = 20;
+      // final int NUM_ITERATIONS = 100;
 
       // int[] key = {se, xo, mt, rp};
       double[] result = new double[NUM_ITERATIONS];
       int[][] resultPath = new int[NUM_ITERATIONS][];
+      int[] resultNumTwoOpts = new int[NUM_ITERATIONS];
+      int[] resultNumGenerations = new int[NUM_ITERATIONS];
+      long[] resultTimeSpent = new long[NUM_ITERATIONS];
 
       for (int i = 0; i < result.length; i++) {
         System.out.println("************ iter #" + i + " ***************");
-        long beginTime = System.currentTimeMillis()/ROUNDNUM;
+        long beginTime = System.currentTimeMillis();
+        long timeSpent;
         init(args);
+        numGenerations = 0;   // Initialize numGenerations
+        numTwoOpts = 0;  // Initialize numTwoOpts
+        /*
         GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
            DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
-           beginTime, true);
+           beginTime/1000, true);
+        */
+
+        /*
+        // FIXME: Uncomment below to start a single 2-Opt
+        int[] p = ArrayUtils.genRandomIntegers(0, pX.length);
+        int[] offspring = runTwoOpt(p, beginTime/1000, timeLimit);
+        double offspringDist = evaluate(offspring);
+        recordPath = offspring;
+        record = offspringDist;
+        */
+
+        // FIXME: Uncomment below to start a Multi-start 2-Opt
+        int reps = 150458;
+        int[] minOffspring = new int[pX.length];
+        double minOffspringDist = Double.MAX_VALUE;
+        int j;
+        for (j = 0; j < reps; j++) {
+          int[] p = ArrayUtils.genRandomIntegers(0, pX.length);
+          int[] offspring = runTwoOpt(p, beginTime/1000, timeLimit);
+          double offspringDist = evaluate(offspring);
+          if (minOffspringDist > offspringDist) {
+            minOffspringDist = offspringDist;
+            minOffspring = offspring;
+          }
+          if (System.currentTimeMillis()/1000 - beginTime/1000 >= timeLimit - 1)
+            break;    // end condition
+        }
+        recordPath = minOffspring;
+        record = minOffspringDist;
+
+
         result[i] = record;
         resultPath[i] = recordPath;
-        System.out.println(Arrays.toString(resultPath[i]));
-        System.out.println(result[i]);
+        resultNumTwoOpts[i] = numTwoOpts;
+        resultNumGenerations[i] = numGenerations;
+        timeSpent = System.currentTimeMillis() - beginTime;
+        resultTimeSpent[i] = timeSpent;
+        System.out.println("path: " + Arrays.toString(resultPath[i]));
+        System.out.println("distance: " + result[i]);
+        System.out.println("numTwoOpts: " + resultNumTwoOpts[i]);
+        System.out.println("numGenerations: " + resultNumGenerations[i]);
+        System.out.println("timeSpent: " + timeSpent);
+        System.out.println("reps: " + j);
 
         /*
-          FIXME: Uncomment below to start a single 2-Opt
-          Path p = new Path(points.length, true);
-          runTwoOpt(p, points, beginTime, timeLimit);
-         */
+        System.out.println("minDist per generation: ");
+        for (int j = 0; j < numGenerations; j++)
+          if (j % 1000 == 0)
+            System.out.println(minDist[j]);
+        System.out.println("avgDist per generation: ");
+        for (int j = 0; j < numGenerations; j++)
+          if (j % 1000 == 0)
+            System.out.println(avgDist[j]);
+        */
 
-        /*
-          FIXME: Uncomment below to start a Multi-start 2-Opt
-          int reps = 10;
-          Path[] ps = new Path[reps];
-          for (int j = 0; j < reps; j++) {
-            beginTime = System.currentTimeMillis()/1000;
-            Path p = new Path(points.length, true);
-            ps[j] = runTwoOpt(p, points, beginTime, timeLimit);
-          }
-         */
         finalize(args);
       }
 
-      for (int i = 0; i < result.length; i++)
+      System.out.println("distances:");
+      for (int i = 0; i < NUM_ITERATIONS; i++)
         System.out.println(result[i]);
-      for (int i = 0; i < result.length; i++)
+      System.out.println("paths:");
+      for (int i = 0; i < NUM_ITERATIONS; i++)
         System.out.println(Arrays.toString(resultPath[i]));
+      System.out.println("numTwoOpts:");
+      for (int i = 0; i < NUM_ITERATIONS; i++)
+        System.out.println(resultNumTwoOpts[i]);
+      System.out.println("numGenerations:");
+      for (int i = 0; i < NUM_ITERATIONS; i++)
+        System.out.println(resultNumGenerations[i]);
+      System.out.println("timeSpents:");
+      for (int i = 0; i < NUM_ITERATIONS; i++)
+        System.out.println(resultTimeSpent[i]);
     }
 
     /**
@@ -121,7 +184,6 @@ public class Main {
               for (int j = 0; j < pX.length; j++) {
                 dist[i][j] = Math.sqrt((pX[i]-pX[j])*(pX[i]-pX[j])
                                      + (pY[i]-pY[j])*(pY[i]-pY[j]));
-                // dist[i][j] = (double)Math.round(dist[i][j]*ROUNDNUM)/ROUNDNUM;
 
                 // dist[i][j] = Math.sqrt(Math.pow(pX[i] - pX[j], 2)
                         // + Math.pow(pY[i] - pY[j], 2));
@@ -176,7 +238,7 @@ public class Main {
         // Do local optimization for the ps in population
         for (int i = 0; i < population.length; i++) {
           // System.out.println("Optimizing p #" + i + " in population...");
-          population[i] = twoOpt(population[i], beginTime, timeLimit);
+          population[i] = runTwoOpt(population[i], beginTime, timeLimit);
           distance[i] = evaluate(population[i]);
           // System.out.println(Arrays.toString(population[i]));
           // System.out.println(distance[i]);
@@ -185,9 +247,12 @@ public class Main {
             recordPath = population[i];
           }
         }
-        // population.evaluateAll(points);
 
         try {
+
+            // minDist = new double[100000];  // Initialize minDist
+            // avgDist = new double[100000];  // Initialize avgDist
+
             /*
             System.out.println("# of points: " + pX.length);
             System.out.println("time limit: " + timeLimit);
@@ -197,6 +262,7 @@ public class Main {
               // FIXME:
               if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
                 break;    // end condition
+              numGenerations++;
 
               /*
               if (iter % 1 == 0) {
@@ -241,6 +307,16 @@ public class Main {
 
               // 5. Replace one of the p in population with the new offspring
               replacement(offspring, replacement, p1, p2, p1Idx, p2Idx);
+
+              /*
+              // Add the minimum distance and the average distance
+              // in this generations as a new element
+              minDist[numGenerations-1] = record;
+              double distanceSum = 0;
+              for (int i = 0; i < distance.length; i++)
+                distanceSum += distance[i];
+              avgDist[numGenerations-1] = distanceSum / distance.length;
+              */
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -258,7 +334,6 @@ public class Main {
         distance += dist[p[i]][p[(i+1)%p.length]];
 
       return distance;
-      // return (double)Math.round(distance*ROUNDNUM)/ROUNDNUM;
     }
 
     /**
@@ -277,7 +352,6 @@ public class Main {
       double gain = dist[p[(i-1+p.length)%p.length]][p[k]] + dist[p[i]][p[(k+1)%p.length]]
                  - (dist[p[(i-1+p.length)%p.length]][p[i]] + dist[p[k]][p[(k+1)%p.length]]);
       return gain;
-      // return (double)Math.round(gain*ROUNDNUM)/ROUNDNUM;
     }
 
 
@@ -287,6 +361,7 @@ public class Main {
      * @return int[]
      */
     private static int[] runTwoOpt(int[] p, long beginTime, double timeLimit) {
+        numTwoOpts++;
         // System.out.println("Start 2-Opt algorithm!");
         int[] offspring = twoOpt(p, beginTime, timeLimit);
         // System.out.println("p: " + offspring.toString());
@@ -657,7 +732,7 @@ public class Main {
       double maxDistance = 0;
       for (int i = 0; i < population.length; i++) {
         // The bigger the distance is, the worse the p is.
-        double iDist = evaluate(population[i]);
+        double iDist = distance[i];
         if (iDist > maxDistance) {
           maxDistance = iDist;
           worstCaseIdx = i;
@@ -665,6 +740,7 @@ public class Main {
       }
       // System.out.println("worstCaseIdx=" + worstCaseIdx + ", maxDistance=" + maxDistance);
       population[worstCaseIdx] = p;
+      distance[worstCaseIdx] = evaluate(p);
     }
 
     /**
@@ -677,12 +753,13 @@ public class Main {
                                               int p1Idx, int p2Idx) {
       int worstParentIdx = 0;
       // The bigger the distance is, the worse the p is.
-      worstParentIdx = evaluate(p1) > evaluate(p2) ? p1Idx : p2Idx;
+      worstParentIdx = distance[p1Idx] > distance[p2Idx] ? p1Idx : p2Idx;
       /*
       System.out.println("worstParentIdx=" + worstParentIdx  + ", maxDistance="
               + (p1.getDistance() > p2.getDistance() ? p1.getDistance() : p2.getDistance()));
               */
       population[worstParentIdx] = p;
+      distance[worstParentIdx] = evaluate(p);
     }
 }
 
