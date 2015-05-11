@@ -182,7 +182,7 @@ public class Main {
               }
 
               // 5. Replace one of the p in population with the new offspring
-              replacement(offspring, replacement, p1, p2, p1Idx, p2Idx);
+              replacement(offspring, offspringDist, replacement, p1, p2, p1Idx, p2Idx);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -298,11 +298,6 @@ public class Main {
      */
     private static int[] selection(int option, double selectionParam) throws Exception {
         switch(option) {
-            /*
-            case ROULETTE_WHEEL_SELECTION:
-                return Selection.rouletteWheelSelection(population,
-                        selectionParam);
-            */
             case TOURNAMENT_SELECTION:
                 return tournamentSelection(selectionParam);
             default:
@@ -358,7 +353,7 @@ public class Main {
         }
 
         // Ensure x1's distance is always better(smaller) than x2's
-        if (evaluate(x1) > evaluate(x2)) {
+        if (distance[tmp1[pX.length]] > distance[tmp2[pX.length]]) {
           int[] tmp = x1; x1 = x2; x2 = tmp; // Swap
         }
 
@@ -481,27 +476,26 @@ public class Main {
      * @exception Exception
      * @return PathPopulation
      */
-    private static void replacement(int[] p, int option, int[] p1, int[] p2,
+    private static void replacement(int[] p, double pDist, int option, int[] p1, int[] p2,
                                     int p1Idx, int p2Idx) throws Exception {
         switch(option) {
             case WORST_PARENT_CASE_REPLACEMENT:
-                worstParentCaseReplacement(p, p1, p2, p1Idx, p2Idx);
+                worstParentCaseReplacement(p, pDist, p1, p2, p1Idx, p2Idx);
                 break;
             default:
                 throw new Exception("Invalid option param.");
         }
     }
 
-    public static void worstParentCaseReplacement(int[] p, int[] p1, int[] p2,
+    public static void worstParentCaseReplacement(int[] p, double pDist, int[] p1, int[] p2,
                                                   int p1Idx, int p2Idx) {
       // The bigger the distance is, the worse the p is.
       // If two parents' are better than the current p, do worstCaseReplacement:
-      double pDist = evaluate(p);
-      if (pDist > evaluate(p1) && pDist > evaluate(p2)) {
-        worstCaseReplacement(p);
+      if (pDist > distance[p1Idx] && pDist > distance[p2Idx]) {
+        worstCaseReplacement(p, pDist);
         // If not, do worstParentReplacement:
       } else {
-        worstParentReplacement(p, p1, p2, p1Idx, p2Idx);
+        worstParentReplacement(p, pDist, p1Idx, p2Idx);
       }
     }
 
@@ -509,7 +503,7 @@ public class Main {
      * Replacing the worst chromosome with the p in the population.
      * @param p
      */
-    public static void worstCaseReplacement(int[] p) {
+    public static void worstCaseReplacement(int[] p, double pDist) {
       int worstCaseIdx = 0;
       double maxDistance = 0;
       for (int i = 0; i < population.length; i++) {
@@ -521,22 +515,23 @@ public class Main {
         }
       }
       population[worstCaseIdx] = p;
-      distance[worstCaseIdx] = evaluate(p);
+      distance[worstCaseIdx] = pDist;
     }
 
     /**
      * Replacing the worse parent with the p in the population.
      * @param p
-     * @param p1
-     * @param p2
+     * @param pDist
+     * @param p1Idx
+     * @param p2Idx
      */
-    public static void worstParentReplacement(int[] p, int[] p1, int[] p2,
+    public static void worstParentReplacement(int[] p, double pDist,
                                               int p1Idx, int p2Idx) {
       int worstParentIdx = 0;
       // The bigger the distance is, the worse the p is.
       worstParentIdx = distance[p1Idx] > distance[p2Idx] ? p1Idx : p2Idx;
       population[worstParentIdx] = p;
-      distance[worstParentIdx] = evaluate(p);
+      distance[worstParentIdx] = pDist;
     }
 }
 
