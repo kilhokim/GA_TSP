@@ -1,13 +1,6 @@
 package kim.kilho.ga.io.file;
 
-// import kim.kilho.ga.exception.InvalidInputException;
-// import kim.kilho.ga.exception.PathException;
-// import kim.kilho.ga.gene.Path;
-// import kim.kilho.ga.gene.Point;
-
 import java.io.*;
-import java.text.NumberFormat;
-import java.util.Arrays;
 
 /**
  * The manager class which provides the following functions:
@@ -114,8 +107,13 @@ public class FileManager {
     // throw IOException for the following line:
     bw = new BufferedWriter(new FileWriter(outputFileName.toString()));
     // NOTE: Convert 0-base notation to 1-base notation.
-    for (int i = 0; i < path.length; i++) path[i] += 1;
-    bw.write(Arrays.toString(path));
+    for (int i = 0; i < path.length; i++) {
+      path[i] += 1;
+      if (i == path.length-1)
+        bw.write(path[i] + "");
+      else
+        bw.write(path[i] + " ");
+    }
     bw.close();
   }
 
