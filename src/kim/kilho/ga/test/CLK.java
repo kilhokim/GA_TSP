@@ -4,7 +4,7 @@ package kim.kilho.ga.test;
  * Created by kilho on 15. 5. 13.
  */
 public class CLK extends CTSPLocalOpt {
-  public static TSPLIB_IO TSP_FILE;
+  private static TSPLIB_IO TSP_FILE;
   public static final double EPS = 1e-8;  // FIXME
   public static final int LK_DEPTH = 40;
 
@@ -76,7 +76,7 @@ public class CLK extends CTSPLocalOpt {
     t[1] = t1;
 
     // Get t2 candidate list
-    t2_cand_list = this.path.getNeighbor(t[1]);
+    t2_cand_list = this.tour.getNeighbor(t[1]);
     if (dist[t1][t2_cand_list[0]] - EPS <= dist[t1][t2_cand_list[1]]) {
       j3 = t2_cand_list[0]; t2_cand_list[0] = t2_cand_list[1]; t2_cand_list[1] = j3;
     }
@@ -87,7 +87,7 @@ public class CLK extends CTSPLocalOpt {
       segTree.setupTree(1, t);
 
       // Get t3 candidate list
-      get_t3_candidate_list();   // status: 0, seg(1)
+      get_t3_cand_list();   // status: 0, seg(1)
       for (j2 = 0; j2 < _num_t3_cand_list; j2++) {
         // status: 0, seg(1)
         t[3] = _t3_cand_list[j2].t3;
@@ -109,7 +109,7 @@ public class CLK extends CTSPLocalOpt {
           if (_Gstar > EPS) break;
 
           // when fail, reverse change to 2change, seg(2)
-          this.path.make2Change(t[1], t[6], t[5], t[4]);
+          this.tour.make2Change(t[1], t[6], t[5], t[4]);
           segTree.setupTree(2, t);
           _i = 2;
         }  // end of t5
@@ -118,7 +118,7 @@ public class CLK extends CTSPLocalOpt {
         // assert(_k == 0);
 
         // Reverse change to 0, seg(1);
-        this.path.make2Change(t[1], t[4], t[3], t[2]);
+        this.tour.make2Change(t[1], t[4], t[3], t[2]);
         segTree.setupTree(1, t);
         _i = 1;
 
@@ -138,7 +138,7 @@ public class CLK extends CTSPLocalOpt {
             search_deeper(improved);  // status: 3change, seg(3)
             if (_Gstar > EPS) break;
             // reverse change to 0, seg(1)
-            this.path.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
+            this.tour.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
             segTree.setupTree(1, t);
             _i = 2;
 
@@ -149,7 +149,7 @@ public class CLK extends CTSPLocalOpt {
               search_deeper(improved);
               if (_Gstar > EPS) break;
               // reverse change to 0, seg(1)
-              this.path.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
+              this.tour.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
               segTree.setupTree(1, t);
               _i = 2;
             }
@@ -162,7 +162,7 @@ public class CLK extends CTSPLocalOpt {
             search_deeper(improved);
             if (_Gstar > EPS) break;
             // reverse change to 0, seg(1)
-            this.path.make4Change(t[1], t[8], t[7], t[6],
+            this.tour.make4Change(t[1], t[8], t[7], t[6],
                     t[5], t[4], t[3], t[2]);
             segTree.setupTree(1, t);
             _i = 2;
@@ -196,6 +196,7 @@ public class CLK extends CTSPLocalOpt {
       Gix = _G[_i-1] + dist[t[ci-1]][ct];
 
       best_nt = Integer.MIN_VALUE;
+      best_nnt = Integer.MIN_VALUE;  // ADDED
       best_gain = -1e100;
       for (i = 0; i < _nnn; i++) {
         // 1. Get a next t candidate of current t.
@@ -298,36 +299,183 @@ public class CLK extends CTSPLocalOpt {
     }
 
     // Sort: maximize |x2| - |y1|.
-    _t3_cand_list = sort(_t3_cand_list, _num_t3_cand_list, 1);
+    _t3_cand_list = sort(_t3_cand_list, _num_t3_cand_list);
   }
 
-  // TODO:
+  // Get (t5, t6) candidates
   private void get_t5_cand_list() {
+    int i, j, t5, t6;
+    double Gix;
 
+    // assert(_i == 2);
+    Gix = _G[1] + TSP_FILE.dist(t[3], t[4]);
+
+    _num_t5_cand_list = 0;
+    for (i = 0; i < _nnn; i++) {
+      // 1. Get a t5 candidate.
+      t5 = TSP_FILE.nni(t[4], i);
+
+      // 2. Check if y2(t4, t5) is valid.
+      //    y2 must be <not in T1> and <not in {x1}>
+      if (tour.isThereEdge(t[4], t5)) continue;
+      if (tour.isSameEdge(t[4], t5, t[1], t[2])) continue;
+
+      // 3. Check if G2 > 0.
+      if (Gix - TSP_FILE.dist(t[4], t5) <= EPS) break;
+
+      // 4. Get a t6 candidate.
+      t6 = segTree.getPrev(t5);
+
+      // 5. Check if x3(t5, t6) are valid.
+      //    x3 must be <in T1> and <not in {y1}>.
+      if (tour.isSameEdge(t5, t6, t[2], t[3])) continue;
+
+      _t5_cand_list[_num_t5_cand_list].t5 = t5;
+      _t5_cand_list[_num_t5_cand_list].t6 = t6;
+      _t5_cand_list[_num_t5_cand_list].gain = TSP_FILE.dist(t5, t6) - TSP_FILE.dist(t[4], t5);
+      _num_t5_cand_list++;
+    }
+
+    // Sort: maximize |x3| - |y2|.
+    _t5_cand_list = sort(_t5_cand_list, _num_t5_cand_list);
+  }
+
+  private void get_alter_t5_cand_list() {
+    int i, j, t5, tmp;
+    int[] t6s, t8s;
+    int t6, t7, t8;
+    int best_t7, best_t8;
+    double Gix, Gixx, gain, best_gain;
+
+    // assert(_i == 2);
+    Gix = _G[1] + TSP_FILE.dist(t[3], t[4]);
+
+    _num_t5_cand_list = 0;
+    for (i = 0; i < _nnn; i++) {
+      // 1. Get a t5 candidate.
+      t5 = TSP_FILE.nni(t[4], i);
+
+      // 2. Check if y2(t4, t5) is valid.
+      //    y2 must be <not in T1> and <not in {x1}>
+      if (tour.isThereEdge(t[4], t5)) continue;
+      if (tour.isSameEdge(t[4], t5, t[1], t[2])) continue;
+
+      // 3. Check if G2 > 0.
+      if (Gix - TSP_FILE.dist(t[4], t5) <= EPS) break;
+
+      // 4. Get two t6 candidates.
+      t6s = tour.getNeighbor(t5);
+
+      // 5. Check if x3s(t5, t6) are valid.
+      //    x3s must be <in T1> and <not in {y1}>, <not in {x1, x2}>.
+      if (tour.isSameEdge(t5, t6s[0], t[2], t[3]) ||
+          tour.isSameEdge(t5, t6s[0], t[1], t[2]) ||
+          tour.isSameEdge(t5, t6s[0], t[3], t[4])) t6s[0] = -1;
+      if (tour.isSameEdge(t5, t6s[1], t[2], t[3]) ||
+          tour.isSameEdge(t5, t6s[1], t[1], t[2]) ||
+          tour.isSameEdge(t5, t6s[1], t[3], t[4])) t6s[1] = -1;
+      if (t6s[0] < 0 && t6s[1] < 0) continue;
+      if (t6s[0] < 0) {
+        tmp = t6s[0];  t6s[0] = t6s[1];  t6s[1] = tmp;
+      }
+
+      // 6. If t6 is between t2 and t3
+      if (segTree.isBetween(t[2], t5, t[3])) {
+        _t5_cand_list[_num_t5_cand_list].code = 1;
+
+        // 1. Swap t6s such that maximizing |x3|.
+        if (t6s[1] > 0 && TSP_FILE.dist(t5, t6s[0]) > TSP_FILE.dist(t5, t6s[1]) + EPS) {
+          tmp = t6s[0];  t6s[0] = t6s[1];  t6s[1] = tmp;
+        }
+
+        _t5_cand_list[_num_t5_cand_list].t6 = t6s[0];
+        _t5_cand_list[_num_t5_cand_list].alter_t6 = t6s[1];
+        _t5_cand_list[_num_t5_cand_list].gain =
+                TSP_FILE.dist(t5, t6s[0]) - TSP_FILE.dist(t[4], t5);
+      } else {
+        _t5_cand_list[_num_t5_cand_list].code = 0;
+
+        // 1. Get valid t6.
+        if (segTree.isBetween(t[4], t6s[0], t5))
+          t6 = t6s[0];
+        else if (t6s[1] >= 0 && segTree.isBetween(t[4], t6s[1], t5))
+          t6 = t6s[1];
+        else continue;
+
+        best_gain = -1e100;
+        best_t7 = Integer.MIN_VALUE;
+        best_t8 = Integer.MIN_VALUE;  // ADDED
+        Gixx = Gix - TSP_FILE.dist(t[4], t5) + TSP_FILE.dist(t5, t6);
+        for (j = 0; j < _nnn; j++) {
+          // 1. Get a t7.
+          t7 = TSP_FILE.nni(t6, i);
+
+          // 2. Check if y3(t6, t7) is valid.
+          //    y3 must be <not in T1> and <not in {x1, y2}>
+          if (tour.isThereEdge(t6, t7)) continue;
+          if (tour.isSameEdge(t6, t7, t[1], t[2])) continue;
+          if (tour.isSameEdge(t6, t7, t[4], t[5])) continue;
+
+          // 3. Check if G3 > 0.
+          if (Gixx - TSP_FILE.dist(t6, t7) <= EPS) break;
+
+          // 4. t7 must lie between t2 and t3.
+          if (!segTree.isBetween(t[2], t7, t[3])) continue;
+
+          // 5. Get two t8 candidates.
+          t8s = tour.getNeighbor(t7);
+
+          // 6. Check if x4s(t7, t8) are valid.
+          //    x4s must be <in T1> and <not in {y1, x1, x2}>.
+          if (tour.isSameEdge(t7, t8s[0], t[1], t[2]) ||
+              tour.isSameEdge(t7, t8s[0], t[3], t[4])) t8s[0] = -1;
+          if (tour.isSameEdge(t7, t8s[1], t[1], t[2]) ||
+              tour.isSameEdge(t7, t8s[1], t[3], t[4])) t8s[1] = -1;
+
+          if (t8s[0] < 0 && t8s[1] < 0) continue;
+          if (t8s[0] < 0) {
+            tmp = t8s[0];  t8s[0] = t8s[1];  t8s[1] = tmp;
+          }
+
+          // 7. Get valid t8 that maximize |x4|.
+          if (t8s[1] >= 0 && TSP_FILE.dist(t7, t8s[0]) < TSP_FILE.dist(t7, t8s[1]) + EPS)
+            t8 = t8s[1];
+          else
+            t8 = t8s[0];
+          gain = TSP_FILE.dist(t7, t8) - TSP_FILE.dist(t6, t7);
+
+          // 8. Compare current (t7, t8) with best (t7, t8)
+          if (gain > best_gain + EPS) {
+            best_t7 = t7;  best_t8 = t8;  best_gain = gain;
+          }
+        }
+        if (best_t7 < 0) continue;
+
+        _t5_cand_list[_num_t5_cand_list].t6 = t6;
+        _t5_cand_list[_num_t5_cand_list].t7 = best_t7;
+        _t5_cand_list[_num_t5_cand_list].t8 = best_t8;
+        _t5_cand_list[_num_t5_cand_list].gain
+                = best_gain + TSP_FILE.dist(t5, t6) - TSP_FILE.dist(t[4], t5);
+      }
+      _t5_cand_list[_num_t5_cand_list].t5 = t5;
+      _num_t5_cand_list++;
+    }
+
+    // Sort: maximize gain.
+    _t5_cand_list = sort(_t5_cand_list, _num_t5_cand_list, EPS);
   }
 
 
 
-  private LK_T3_CAND[] sort(LK_T3_CAND[] arr_name, int size, int t) {
+  private LK_T3_CAND[] sort(LK_T3_CAND[] arr_name, int size) {
     int i, cur, key;
     boolean replace_cond = false;
     LK_T3_CAND tmp;
     for (i = 0; i < size-1; i++) {
       key = i;
       for (cur = i+1; cur < size; cur++) {
-        switch (t) {
-          // maximize |x2| - |y1|
-          case 1:
-            replace_cond = _t3_cand_list[cur].gain > _t3_cand_list[key].gain + EPS;
-            break;
-          // maximize |x3| - |y2|
-          case 2:
-            break;
-          // maximize gain
-          case 3:
-          default:
-            break;
-        }
+        // maximize |x2| - |y1|
+        replace_cond = _t3_cand_list[cur].gain > _t3_cand_list[key].gain + EPS;
         if (replace_cond) key = cur;
       }
       tmp = arr_name[i];  arr_name[i] = arr_name[key];  arr_name[key] = tmp;
@@ -335,5 +483,82 @@ public class CLK extends CTSPLocalOpt {
     return arr_name;
   }
 
+  private LK_T5_CAND[] sort(LK_T5_CAND[] arr_name, int size) {
+    int i, cur, key;
+    boolean replace_cond = false;
+    LK_T5_CAND tmp;
+    for (i = 0; i < size-1; i++) {
+      key = i;
+      for (cur = i+1; cur < size; cur++) {
+        // maximize |x3| - |y2|
+        replace_cond = _t5_cand_list[cur].gain > _t5_cand_list[key].gain;
+        if (replace_cond) key = cur;
+      }
+      tmp = arr_name[i];  arr_name[i] = arr_name[key];  arr_name[key] = tmp;
+    }
+    return arr_name;
+
+  }
+
+  private LK_T5_CAND[] sort(LK_T5_CAND[] arr_name, int size, double eps) {
+    int i, cur, key;
+    boolean replace_cond = false;
+    LK_T5_CAND tmp;
+    for (i = 0; i < size-1; i++) {
+      key = i;
+      for (cur = i+1; cur < size; cur++) {
+        // maximize gain
+        replace_cond = _t5_cand_list[cur].gain > _t5_cand_list[key].gain + eps;
+        if (replace_cond) key = cur;
+      }
+      tmp = arr_name[i];  arr_name[i] = arr_name[key];  arr_name[key] = tmp;
+    }
+    return arr_name;
+  }
+
+  private void make_two_change(int improved) {
+    // Now, we know t[1] ~ t[2*i]. We know G[0] ~ G[i-2].
+    int ci = (_i-1)*2;
+
+    // Segment tree
+    segTree.do2Change(t[1], t[ci], t[ci+1], t[ci+2]);
+
+    // C2EdgeTour
+    tour.make2Change(t[1], t[ci], t[ci+1], t[ci+2]);
+
+    _G[_i-1] = _G[_i-2] + TSP_FILE.dist(t[ci-1], t[ci]) - TSP_FILE.dist(t[ci], t[ci+1]);
+    check_and_update(improved);
+  }
+
+  private void make_three_change(int improved) {
+    // Now, we know t[1] ~ t[6]. We know G[0].
+
+    // Segment tree
+    segTree.do3Change(t[1], t[2], t[3], t[4], t[5], t[6]);
+
+    // C2EdgeTour
+    tour.make3Change(t[1], t[2], t[3], t[4], t[5], t[6]);
+
+    _G[1] = TSP_FILE.dist(t[1], t[2]) - TSP_FILE.dist(t[2], t[3]);
+    _G[2] = _G[1] + TSP_FILE.dist(t[3], t[4]) - TSP_FILE.dist(t[4], t[5]);
+
+    check_and_update(improved);
+  }
+
+  private void make_four_change(int improved) {
+    // Now, we know t[1] ~ t[8]. We know G[0].
+
+    // Segment tree
+    segTree.do4Change(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8]);
+
+    // C2EdgeTour
+    tour.make4Change(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8]);
+
+    _G[1] = TSP_FILE.dist(t[1], t[2]) - TSP_FILE.dist(t[2], t[3]);
+    _G[2] = _G[1] + TSP_FILE.dist(t[3], t[4]) - TSP_FILE.dist(t[4], t[5]);
+    _G[3] = _G[2] + TSP_FILE.dist(t[5], t[6]) - TSP_FILE.dist(t[6], t[7]);
+
+    check_and_update(improved);
+  }
 
 }

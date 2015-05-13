@@ -6,6 +6,7 @@ import java.util.Random;
  * Created by kilho on 15. 5. 13.
  */
 public class C2EdgeTour {
+  private static TSPLIB_IO TSP_FILE;
   private int length;  // the total length of tour sequence
   private double distance; // total distance for the tour
   // TODO: Clearly define variables below:
@@ -31,8 +32,10 @@ public class C2EdgeTour {
     e2 = null;
   }
 
-  public C2EdgeTour(int length) {
+  public C2EdgeTour(int length, TSPLIB_IO tsp_file) {
     create(length);
+    // NOTE: ADDED::
+    TSP_FILE = tsp_file;
   }
 
   public int getLength() {
@@ -51,14 +54,13 @@ public class C2EdgeTour {
     return (getLength() - count);
   }
 
-  // TODO: Should load distance matrix when it is called
-  public double evaluate(double[][] dist) {
+  public double evaluate() {
     int[] vs;
 
     distance = 0;
     enumEdgeFirst(0);
     while ((vs = enumEdgeNext()) != null)
-      distance += dist[vs[0]][vs[1]];
+      distance += TSP_FILE.dist(vs[0], vs[1]);
     return distance;
   }
 

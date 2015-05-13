@@ -33,9 +33,9 @@ public class CLookbitQueue {
       // assert(c2);
       for (i = 0; i < length; i++) {
         if (!tour.isThereEdge(i, c1.e1[i]) ||
-                !tour.isThereEdge(i, c1.e2[i]) ||
-                !tour.isThereEdge(i, c2.e1[i]) ||
-                !tour.isThereEdge(i, c2.e2[i]))
+            !tour.isThereEdge(i, c1.e2[i]) ||
+            !tour.isThereEdge(i, c2.e1[i]) ||
+            !tour.isThereEdge(i, c2.e2[i]))
           addLookbit(i);
       }
     }
