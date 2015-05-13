@@ -26,7 +26,7 @@ public class TSPLIB_IO {
   POINT[] gNodeCoords;   // When NODE_COORD_SECTION exists, used
   TSP_FILE_INFO gtfi;
   static String gGraphName;   // Graph name (without file extension)
-  int gOptimumCost;  // Optimum path cost or lower bound if not, 0
+  int gOptimumCost;  // Optimum tour cost or lower bound if not, 0
   int[] gOrgInfo;    // idx: remapped city's id
   // value: original city's id
 
@@ -97,16 +97,16 @@ public class TSPLIB_IO {
   }
 
   /**
-   * TODO: Read path file.
+   * TODO: Read tour file.
    */
-  public boolean readPathFile(String fileName, int[] path, int size) {
+  public boolean readTourFile(String fileName, int[] tour, int size) {
     return true;
   }
 
   /**
-   * TODO: Read optimal path file.
+   * TODO: Read optimal tour file.
    */
-  public boolean readOptPathFile(int[] opt_path, int size) {
+  public boolean readOptTourFile(int[] opt_tour, int size) {
     return true;
   }
 
@@ -141,13 +141,13 @@ public class TSPLIB_IO {
   public void error(String format, String str) {
   }
 
-  // TODO: Print a sequence of coordinates to file, instead of path sequence
-  public void printCoords(int[] path, int size) {
+  // TODO: Print a sequence of coordinates to file, instead of tour sequence
+  public void printCoords(int[] tour, int size) {
     /*
     System.out.println("Entering printCoords()");
     if (gNodeCoords != null) {
       for (int i = 0; i < size; i++) {
-        int t = (gOrgInfo != null) ? gOrgInfo[path[i]] : path[i];
+        int t = (gOrgInfo != null) ? gOrgInfo[tour[i]] : tour[i];
         for (int j = 0; j < gtfi.nCoordDim; j++)
 
       }
@@ -164,8 +164,8 @@ public class TSPLIB_IO {
     return -1;
   }
 
-  // TODO: Print the path sequence to file
-  public void printPath(int[] path, int size) {
+  // TODO: Print the tour sequence to file
+  public void printTour(int[] tour, int size) {
 
   }
 
@@ -362,4 +362,7 @@ public class TSPLIB_IO {
     return gDistMat[Math.max(c1,c2)*(Math.max(c1,c2)-1)/2 + Math.min(c1,c2)];
   }
 
+  public int nni(int i, int nth) {
+    return gNNI[(i)*gNumNN + (nth)];
+  }
 }

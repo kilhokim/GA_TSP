@@ -1,13 +1,11 @@
 package kim.kilho.ga.test;
 
-import kim.kilho.ga.gene.Path;
-
 /**
  * Created by kilho on 15. 5. 13.
  */
 public class CSegmentTree {
   private static int LK_DEPTH = 40;   // FIXME
-  private Path _path;
+  private C2EdgeTour _tour;
   private int _n;   // The number of cities in the path
   private SEGMENT[] _seg_tree;
   private int _seg_size;  // The number of nodes in segment tree
@@ -43,14 +41,14 @@ public class CSegmentTree {
      */
   }
 
-  public void setupCityOrder(Path path) {
+  public void setupCityOrder(C2EdgeTour path) {
     // assert(path && path.isTour());
     int city, order;
 
-    _path = path;
-    _path.findFirst(0);
+    _tour = path;
+    _tour.findFirst(0);
     order = 0;
-    while ((city = _path.findNext()) >= 0)
+    while ((city = _tour.findNext()) >= 0)
       _city_order[city] = order++;
     // assert(order == _n);
   }
@@ -82,9 +80,9 @@ public class CSegmentTree {
     }
     if (to == 2) {
       // assert(_seg_size == 1);
-      _path.make2Change(t[1], t[4], t[3], t[2]);
+      _tour.make2Change(t[1], t[4], t[3], t[2]);
       do2Change(t[1], t[2], t[3], t[4]);
-      _path.make2Change(t[1], t[2], t[3], t[4]);
+      _tour.make2Change(t[1], t[2], t[3], t[4]);
     }
   }
 
@@ -122,10 +120,10 @@ public class CSegmentTree {
   private int getCityByOrder(int order, int referCity) {
     int city;
     order = (order + _n) % _n;
-    city = _path.e1[referCity];
+    city = _tour.e1[referCity];
     if (city >= 0 && _city_order[city] == order)
       return city;
-    city = _path.e2[referCity];
+    city = _tour.e2[referCity];
     if (city >= 0 && _city_order[city] == order)
       return city;
     // assert(0);   // invalid referCity or order;
@@ -349,7 +347,7 @@ public class CSegmentTree {
       }
     }
     c = getCityByOrder(b_order, city);
-    // assert(_path.isThereEdge(city, c));
+    // assert(_tour.isThereEdge(city, c));
     return c;
   }
 
@@ -374,7 +372,7 @@ public class CSegmentTree {
       }
     }
     c = getCityByOrder(b_order, city);
-    // assert(_path.isThereEdge(city, c));
+    // assert(_tour.isThereEdge(city, c));
     return c;
   }
 

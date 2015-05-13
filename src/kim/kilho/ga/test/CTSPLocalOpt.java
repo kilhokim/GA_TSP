@@ -1,7 +1,5 @@
 package kim.kilho.ga.test;
 
-import kim.kilho.ga.gene.Path;
-
 /**
  * Created by kilho on 15. 5. 13.
  */
@@ -16,6 +14,7 @@ public class CTSPLocalOpt {
     numNN = num_nn;
   }
 
-  public void run(Path path, Path op1, Path op2, Path op3, Path op4, Path op5) {}
+  public void run(C2EdgeTour tour, C2EdgeTour op1, C2EdgeTour op2,
+                  C2EdgeTour op3, C2EdgeTour op4, C2EdgeTour op5) {}
 }
 

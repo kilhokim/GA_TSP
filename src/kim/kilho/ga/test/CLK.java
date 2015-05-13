@@ -1,15 +1,16 @@
 package kim.kilho.ga.test;
 
-import kim.kilho.ga.gene.Path;
-
 /**
  * Created by kilho on 15. 5. 13.
  */
 public class CLK extends CTSPLocalOpt {
+  public static TSPLIB_IO TSP_FILE;
   public static final double EPS = 1e-8;  // FIXME
+  public static final int LK_DEPTH = 40;
+
   public double[][] dist;  // FIXME
   public int[] nni;
-  private Path path;
+  private C2EdgeTour tour;
   private int _i;   // Current level
   private int _k;   // Level to obtain $G^*$
   private double[] _G;  // Gain up to current level
@@ -26,7 +27,7 @@ public class CLK extends CTSPLocalOpt {
   class LK_T5_CAND { int t5; int t6; int alter_t6;
     int t7; int t8; int code; double gain; }
 
-  public CLK(int num_city, int num_nn) {
+  public CLK(int num_city, int num_nn, TSPLIB_IO tsp_file) {
     super(num_city, num_nn);
     System.out.println("Entering CLK()");
     _n = num_city;
@@ -35,28 +36,31 @@ public class CLK extends CTSPLocalOpt {
     t = new int[_n*2+2];
     _t3_cand_list = new LK_T3_CAND[_nnn];
     _t5_cand_list = new LK_T5_CAND[_nnn];
+
+    // NOTE: ADDED::
+    this.TSP_FILE = tsp_file;
     System.out.println("Quitting CLK()");
   }
 
   @Override
-  public void run(Path path, Path p1, Path p2,
-                  Path best, Path worst, Path other) {
+  public void run(C2EdgeTour tour, C2EdgeTour p1, C2EdgeTour p2,
+                  C2EdgeTour best, C2EdgeTour worst, C2EdgeTour other) {
     System.out.println("Entering CLK::run()");
     int t1, improved;
 
-    lookbitQueue.construct(path, p1, p2);
-    this.path = path;
+    lookbitQueue.construct(tour, p1, p2);
+    this.tour = tour;
 
     // Initialize time-stamping -- segment tree
     segTree.initTimeStamping();
 
     // Run LK
-    segTree.setupCityOrder(path);
+    segTree.setupCityOrder(tour);
     improved = 1;
     while ((t1 = lookbitQueue.deleteLookbit()) >= 0) {
       if (do_lk_search(t1, improved) > EPS) {
         improved++;
-        segTree.setupCityOrder(path);
+        segTree.setupCityOrder(tour);
       } else
         improved = 0;
     }
@@ -195,11 +199,140 @@ public class CLK extends CTSPLocalOpt {
       best_gain = -1e100;
       for (i = 0; i < _nnn; i++) {
         // 1. Get a next t candidate of current t.
-        // TODO:
-        nt = nni(ct, i);
+        nt = TSP_FILE.nni(ct, i);   // FIXME: Refers TSP_FILE
+
+        // 2. Check if yi(ct, nt) is valid.
+        //    yi must be <not in T> and <not in {x1, x2, ..., xi-1}>.
+        if (tour.isThereEdge(ct, nt)) continue;
+
+        // 3. Check if Gi > 0.
+        if (Gix - TSP_FILE.dist(ct, nt) <= EPS) break;
+
+        // 4. Get a next next t candidate
+        nnt = segTree.getPrev(nt);
+
+        // 5. Check if x{i+1}(nt, nnt) are valid.
+        //    1) Check if gain is better than best_gain.
+        //    2) x{i+1}s must be <in T> and
+        //       <not in {y1, y2, ..., yi-1}>.
+        gain = TSP_FILE.dist(nt, nnt) - TSP_FILE.dist(ct, nt);
+        if (gain <= best_gain + EPS) continue;
+
+        for (j = 1; j < _i; j++)
+          if (tour.isSameEdge(nt, nnt, t[j*2], t[j*2+1]))
+            break;
+        if (j < _i) continue;
+        best_nt = nt;  best_nnt = nnt;  best_gain = gain;
       }
+      if (best_nt < 0) break;
+
+      t[ci+1] = best_nt;
+      t[ci+2] = best_nnt;
+      _i++;
+      make_two_change(improved);
+    } while (_i <= LK_DEPTH && _G[_i-1] > _Gstar + EPS);
+
+    if (-EPS < _Gstar && _Gstar < EPS)
+      reverse_change(start_i);  // restore
+  }
+
+  private int check_and_update(int improved) {
+    double gistar = TSP_FILE.dist(t[2*_i-1], t[2*_i]) - TSP_FILE.dist(t[2*_i], t[1]);
+    if (_G[_i-1]+gistar > _Gstar+EPS) {
+      _Gstar = _G[_i-1] + gistar;
+      _k = _i;
+      return 1;
+    }
+    return 0;
+  }
+
+  private void reverse_change_to_best(int improved) {
+    // assert(_k <= _i && _k > 1);
+    int i = _i;
+    while (i > _k) {
+      i--;
+      tour.make2Change(t[1], t[i*2+2], t[i*2+1], t[i*2]);
     }
 
+    for (i = _k*2; i > 0; i--)  // set look-biut
+      lookbitQueue.addLookbit(t[i]);
+  }
+
+  private void reverse_change(int to) {
+    // assert(to <= _i && to > 0);
+    while (_i > to) {
+      _i--;
+      tour.make2Change(t[1], t[_i*2+2], t[_i*2+1], t[_i*2]);
+    }
+  }
+
+  // Get (t3, t4) candidates
+  private void get_t3_cand_list() {
+    int i, j, t3, t4, alter_t4;
+    double x1_d;
+
+    // assert(_i == 1);
+    x1_d = TSP_FILE.dist(t[1], t[2]);
+    _num_t3_cand_list = 0;
+    for (i = 0; i < _nnn; i++) {
+      // 1. Get a t3 candidate.
+      t3 = TSP_FILE.nni(t[2], i);
+
+      // 2. Check if y1(t2, t3) is valid. y1 must be <not in T0>
+      if (tour.isThereEdge(t[2], t3)) continue;
+
+      // 3. Check if G1 > 0.
+      if (x1_d - TSP_FILE.dist(t[2], t3) <= EPS) break;
+
+      // 4. Get two t4 candidates.
+      t4 = segTree.getPrev(t3);
+      alter_t4 = segTree.getNext(t3);
+
+      // 5. Check if x2s(t3, t4) are valid. x2s must be <in T0>.
+      //    In this case, this condition is always satisfied.
+      _t3_cand_list[_num_t3_cand_list].t3 = t3;
+      _t3_cand_list[_num_t3_cand_list].t4 = t4;
+      _t3_cand_list[_num_t3_cand_list].alter_t4 = alter_t4;
+      _t3_cand_list[_num_t3_cand_list].gain = TSP_FILE.dist(t3, t4) - TSP_FILE.dist(t[2], t3);
+      _num_t3_cand_list++;
+    }
+
+    // Sort: maximize |x2| - |y1|.
+    _t3_cand_list = sort(_t3_cand_list, _num_t3_cand_list, 1);
+  }
+
+  // TODO:
+  private void get_t5_cand_list() {
+
+  }
+
+
+
+  private LK_T3_CAND[] sort(LK_T3_CAND[] arr_name, int size, int t) {
+    int i, cur, key;
+    boolean replace_cond = false;
+    LK_T3_CAND tmp;
+    for (i = 0; i < size-1; i++) {
+      key = i;
+      for (cur = i+1; cur < size; cur++) {
+        switch (t) {
+          // maximize |x2| - |y1|
+          case 1:
+            replace_cond = _t3_cand_list[cur].gain > _t3_cand_list[key].gain + EPS;
+            break;
+          // maximize |x3| - |y2|
+          case 2:
+            break;
+          // maximize gain
+          case 3:
+          default:
+            break;
+        }
+        if (replace_cond) key = cur;
+      }
+      tmp = arr_name[i];  arr_name[i] = arr_name[key];  arr_name[key] = tmp;
+    }
+    return arr_name;
   }
 
 

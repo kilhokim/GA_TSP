@@ -1,7 +1,5 @@
 package kim.kilho.ga.test;
 
-import kim.kilho.ga.gene.Path;
-
 /**
  * Created by kilho on 15. 5. 13.
  */
@@ -18,7 +16,7 @@ public class CLookbitQueue {
   }
 
   // Construct an initial lookbit queue from c1 & c2
-  public void construct(Path path, Path c1, Path c2) {
+  public void construct(C2EdgeTour tour, C2EdgeTour c1, C2EdgeTour c2) {
     // assert(tour.getLength() == this.length);
     int i, t;
     int[] ns;
@@ -27,17 +25,17 @@ public class CLookbitQueue {
     look_head = -1;
     look_tail = -1;
     if (c1 == null) {
-      ns = path.getNeighbor(length/2);
+      ns = tour.getNeighbor(length/2);
       t = ns[0]; i = ns[1];
       for (i = 0; i < length; i++)
         addLookbit((t+i) % length);
     } else {
       // assert(c2);
       for (i = 0; i < length; i++) {
-        if (!path.isThereEdge(i, c1.e1[i]) ||
-                !path.isThereEdge(i, c1.e2[i]) ||
-                !path.isThereEdge(i, c2.e1[i]) ||
-                !path.isThereEdge(i, c2.e2[i]))
+        if (!tour.isThereEdge(i, c1.e1[i]) ||
+                !tour.isThereEdge(i, c1.e2[i]) ||
+                !tour.isThereEdge(i, c2.e1[i]) ||
+                !tour.isThereEdge(i, c2.e2[i]))
           addLookbit(i);
       }
     }
