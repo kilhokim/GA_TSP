@@ -1,5 +1,7 @@
 package kim.kilho.ga.test;
 
+import java.util.Arrays;
+
 /**
  * Created by kilho on 15. 5. 13.
  */
@@ -39,6 +41,9 @@ public class CLookbitQueue {
           addLookbit(i);
       }
     }
+    System.out.println("look_bit_queue=" + Arrays.toString(look_bit_queue));
+    System.out.println("look_head=" + look_head);
+    System.out.println("look_tail=" + look_tail);
   }
 
   // Add a new city c into lookbit queue

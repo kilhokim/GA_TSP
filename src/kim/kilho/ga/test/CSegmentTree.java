@@ -7,6 +7,7 @@ import java.util.Arrays;
  */
 public class CSegmentTree {
   private static int LK_DEPTH = 40;   // FIXME
+
   private C2EdgeTour _tour;
   private int _n;   // The number of cities in the tour
   private SEGMENT[] _seg_tree;
@@ -17,6 +18,8 @@ public class CSegmentTree {
   private int _current_time;   // current time
 
   class SEGMENT {
+    int index;    // ADDED: index in _seg_tree
+    boolean from_loc;   // ADDED: indicator if it is from _loc
     int reversal;   // reversal bit
     int first;    // The first city of this segment
     int last;     // The last city of this segment
@@ -31,11 +34,17 @@ public class CSegmentTree {
     _city_order = new int[_n];
     _time_stamp = new int[_n];
     _seg_tree = new SEGMENT[(LK_DEPTH+2)*2];
-    for (int i = 0; i < _seg_tree.length; i++)
+    for (int i = 0; i < _seg_tree.length; i++) {
       _seg_tree[i] = new SEGMENT();
+      _seg_tree[i].index = i;
+      _seg_tree[i].from_loc = false;
+    }
     _loc = new SEGMENT[_n];
-    for (int i = 0; i < _loc.length; i++)
+    for (int i = 0; i < _loc.length; i++) {
       _loc[i] = new SEGMENT();
+      _loc[i].index = i;
+      _loc[i].from_loc = true;
+    }
 
     _current_time = 1;  // Initial time stamping
     for (int i = 0; i < _n; i++)
@@ -43,10 +52,8 @@ public class CSegmentTree {
   }
 
   public void initTimeStamping() {
-    /*
     _current_time = 1;
     for (int i = 0; i < _n; i++) _time_stamp[i] = 0;
-     */
   }
 
   public void setupCityOrder(C2EdgeTour tour) {
@@ -56,8 +63,10 @@ public class CSegmentTree {
     _tour = tour;
     _tour.findFirst(0);
     order = 0;
-    while ((city = _tour.findNext()) >= 0)
+    while ((city = _tour.findNext()) >= 0) {
       _city_order[city] = order++;
+    }
+    System.out.println("_city_order=" + Arrays.toString(_city_order));
     // assert(order == _n);
   }
 
@@ -92,53 +101,57 @@ public class CSegmentTree {
       do2Change(t[1], t[2], t[3], t[4]);
       _tour.make2Change(t[1], t[2], t[3], t[4]);
     }
+    System.out.println("_tour.e1=" + Arrays.toString(_tour.e1));
+    System.out.println("_tour.e2=" + Arrays.toString(_tour.e2));
+    System.out.println("_time_stamp=" + Arrays.toString(_time_stamp));
+    System.out.println("_current_time=" + _current_time);
   }
 
   private SEGMENT findSegment(int city) {
     int order;
-    boolean pointIndicator = true;
     SEGMENT seg = null;
     // assert(city >= 0 && city < _n);
-    System.out.println("city=" + city);
-    // System.out.println("_loc=" + Arrays.toString(_loc));
-    // System.out.println("_seg_tree=" + Arrays.toString(_seg_tree));
 
     // Determine proper root to traverse the tree down.
-    if (_time_stamp[city] == _current_time) {
+    if (_time_stamp[city] == _current_time)
       seg = _loc[city];
-      pointIndicator = true;
-    } else {
+    else
       seg = _seg_tree[0];   // _seg_tree[0] is always real root of the tree
-      pointIndicator = false;
-    }
-
-    System.out.println("seg.first=" + seg.first + ", seg.last=" + seg.last);
 
     // Traverse down
     order = _city_order[city];
-    System.out.println("order=" + order);
     while (true) {
-      if (seg.first <= order && order <= seg.last) {
-        if (_time_stamp[city] != _current_time) {
-          _loc[city] = seg;
-          _time_stamp[city] = _current_time;
+      try {
+        Thread.sleep(100);
+        // System.out.println("while (true) in findSegment()...");
+        System.out.println("seg.first=" + seg.first + ", order=" + order + ", seg.last=" + seg.last);
+        if (seg.first <= order && order <= seg.last) {
+          if (_time_stamp[city] != _current_time) {
+            _loc[city] = seg;
+            _time_stamp[city] = _current_time;
+          }
+          break;
+        } else if (seg.first > order)
+          seg = seg.left_child;
+        else {
+          // assert(seg.last < order);
+          seg = seg.right_child;
         }
-        break;
-      } else if (seg.first > order)
-        seg = seg.left_child;
-      else {
-        // assert(seg.last < order);
-        seg = seg.right_child;
+      } catch (InterruptedException e) {
+        e.printStackTrace();
       }
     }
 
-    if (pointIndicator)
-      _loc[city] = seg;
-    else
-      _seg_tree[0] = seg;
-
     // assert(seg != null);
     return seg;
+  }
+
+  // ADDED: Set segment
+  private void setSegment(SEGMENT seg) {
+    if (seg.from_loc)
+      _loc[seg.index] = seg;
+    else
+      _seg_tree[0] = seg;
   }
 
   private int getCityByOrder(int order, int referCity) {
@@ -219,6 +232,10 @@ public class CSegmentTree {
       }
     }
     // assert(isCorrect());
+    // ADDED:
+    setSegment(new1);
+    setSegment(new2);
+    setSegment(seg);
   }
 
   public void reverseTree() {
@@ -233,7 +250,8 @@ public class CSegmentTree {
   }
 
   private void reverseSegment(SEGMENT start, SEGMENT end) {
-    SEGMENT left, right, cur, next, tmp;
+    SEGMENT left = null, right = null, cur = null,
+            next = null, tmp;
     if (start == end)
       start.reversal = 1 - start.reversal;  // !start.reversal
     else if (start.prev == end) {
@@ -264,6 +282,12 @@ public class CSegmentTree {
       end.prev = left;
     }
     // assert(isCorrect());
+    setSegment(start);
+    setSegment(end);
+    setSegment(left);
+    setSegment(right);
+    setSegment(cur);
+    setSegment(next);
   }
 
   private boolean isCorrect() {

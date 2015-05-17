@@ -3,6 +3,8 @@ package kim.kilho.ga.test;
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
 
+import java.util.Arrays;
+
 /**
  * Created by kilho on 15. 5. 13.
  */
@@ -97,6 +99,13 @@ public class TSPLIB_IO {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    System.out.println("gNumCity=" + gNumCity);
+    System.out.println("gNodeCoords=");
+    for (int i = 0; i < gNodeCoords.length; i++) {
+      POINT curr = gNodeCoords[i];
+      System.out.println("[" + curr.pt[0] + "," + curr.pt[1] + "]");
+    }
+    System.out.println("gDistMat=" + Arrays.toString(gDistMat));
   }
 
   public double getEuc2DDist(int c1, int c2) {
@@ -240,6 +249,8 @@ public class TSPLIB_IO {
       gNNI = constructNormal(gNNI);
     }
 
+    System.out.println("gNumNN=" + gNumNN);
+    System.out.println("gNNI=" + Arrays.toString(gNNI));
     System.out.println("Quitting constructNN()");
   }
 

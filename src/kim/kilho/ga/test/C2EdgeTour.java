@@ -1,5 +1,6 @@
 package kim.kilho.ga.test;
 
+import java.util.Arrays;
 import java.util.Random;
 
 /**
@@ -35,6 +36,8 @@ public class C2EdgeTour {
     create(length);
     // NOTE: ADDED::
     TSP_FILE = tsp_file;
+    System.out.println("e1=" + Arrays.toString(e1));
+    System.out.println("e2=" + Arrays.toString(e2));
   }
 
   public int getLength() {
