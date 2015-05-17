@@ -12,6 +12,8 @@ public class CTSPLocalOpt {
   public CTSPLocalOpt(int num_city, int num_nn) {
     numCity = num_city;
     numNN = num_nn;
+    lookbitQueue = new CLookbitQueue(num_city);
+    segTree = new CSegmentTree(num_city);
   }
 
   public void run(C2EdgeTour tour, C2EdgeTour op1, C2EdgeTour op2,

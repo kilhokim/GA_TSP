@@ -55,12 +55,18 @@ public class TSPLIB_IO {
     String szDisplayDataType;
   }
 
+  public TSPLIB_IO() {
+    // gNodeCoords = new POINT[n];
+    gtfi = new TSP_FILE_INFO();
+  }
+
   public void readTspFile(String graphName) {
     FileManager fm = new FileManager();
     try {
       System.out.println("Entering readTspFile()");
       Object[] input = fm.read(graphName, 600);
       Point[] points = (Point[])input[0];
+      System.out.println("points.length=" + points.length);
       gtfi.nDimension = points.length;
       // gtfi.nDimension++;   // TODO: Why?
       gNumCity = gtfi.nDimension;
@@ -72,8 +78,12 @@ public class TSPLIB_IO {
       gNodeCoords = new POINT[n];
       gtfi.nCoordDim = 2;
       for (int i = 0; i < n; i++) {
-        gNodeCoords[i].pt[0] = points[i].getX();
-        gNodeCoords[i].pt[1] = points[i].getY();
+        POINT currPoint = new POINT();
+        currPoint.pt[0] = points[i].getX();
+        currPoint.pt[1] = points[i].getY();
+        gNodeCoords[i] = currPoint;
+        // gNodeCoords[i].pt[0] = points[i].getX();
+        // gNodeCoords[i].pt[1] = points[i].getY();
       }
 
       gDistMat = new double[(n*(n-1))/2];
@@ -218,22 +228,22 @@ public class TSPLIB_IO {
     gNumNN = numNN;
     if (is_quadrant &&
             (gtfi.szEdgeWeightType.equals("EUC_2D") ||
-                    gtfi.szEdgeWeightType.equals("CEIL_2D") ||
-                    gtfi.szEdgeWeightType.equals("ATT"))) {
+             gtfi.szEdgeWeightType.equals("CEIL_2D") ||
+             gtfi.szEdgeWeightType.equals("ATT"))) {
       if (numNN % 20 != 0) gNumNN = (numNN/20 + 1) * 20;   // TODO: Why 20?
       if (gNumNN >= gNumCity) gNumNN -= 20;
       gNNI = new int[gNumCity*gNumNN];
-      constructQuadNeighbors(gNNI);
+      gNNI = constructQuadNeighbors(gNNI);
     } else {
       if (gNumNN >= gNumCity) gNumNN = gNumCity - 1;
       gNNI = new int[gNumCity*gNumNN];
-      constructNormal(gNNI);
+      gNNI = constructNormal(gNNI);
     }
 
     System.out.println("Quitting constructNN()");
   }
 
-  public void constructNormal(int[] NNI) {
+  public int[] constructNormal(int[] NNI) {
     System.out.println("Entering constructNormal");
     int[] neighbors = new int[gNumCity-1];
     double[] ndist = new double[gNumCity-1];
@@ -245,15 +255,17 @@ public class TSPLIB_IO {
           ndist[count++] = dist(i, j);
         }
       // sort neighbors to "numNN"th.
-      sortNeighbors(neighbors, ndist, gNumCity-1, gNumNN);
+      neighbors = sortNeighbors(neighbors, ndist, gNumCity-1, gNumNN);
 
       for (int j = 0; j < gNumNN; j++)
         NNI[i*gNumNN+j] = neighbors[j];
     }
     System.out.println("Quitting constructNormal");
+
+    return NNI;
   }
 
-  public void constructQuadNeighbors(int[] NNI) {
+  public int[] constructQuadNeighbors(int[] NNI) {
     int dir, i, j, k, t;
     int[][] nns = new int[4][];
     int[] size = new int[4], alloc = new int[4];
@@ -292,28 +304,30 @@ public class TSPLIB_IO {
       // sort neighbors to "alloc[i]"th. and combine...
       t = 0;
       for (j = 0; j < 4; j++) {
-        sortNeighbors(nns[j], ndist[j], size[j], alloc[j]);
+        nns[j] = sortNeighbors(nns[j], ndist[j], size[j], alloc[j]);
         for (k = 0; k < alloc[j]; k++) {
           nns[0][t] = nns[j][k];
           ndist[0][t++] = ndist[j][k];
         }
       }
       // assert(t == gNumNN);
-      sortNeighbors(nns[0], ndist[0], gNumNN, gNumNN);
+      nns[0] = sortNeighbors(nns[0], ndist[0], gNumNN, gNumNN);
       for (j = 0; j < gNumNN; j++)
         NNI[i*gNumNN+j] = nns[0][j];
     }
     System.out.println("Quitting constructQuadNeighbors()");
+
+    return NNI;
   }
 
-  public void sortNeighbors(int[] neighbors, double[] ndist, int size, int numNN) {
+  public int[] sortNeighbors(int[] neighbors, double[] ndist, int size, int numNN) {
     int mini, j, k, t;
     int left, right, prev_right;
     double pivot, doublet;
     // int count = 0; double swap_ratio;
 
     // assert(size >= numNN);
-    if (size == 0 || size == 1) return; // A sort is not needed
+    if (size == 0 || size == 1) return null; // A sort is not needed
 
     // Quick sort variants
     pivot = 0; left = 0; prev_right = size; right = size;
@@ -356,6 +370,7 @@ public class TSPLIB_IO {
     // System.out.println("prev_right= " + size +
     //                     ", ratio= " + (float)count/(float)gNumCity);
 
+    return neighbors;
   }
 
   public double dist(int c1, int c2) {

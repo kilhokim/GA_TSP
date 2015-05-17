@@ -1,5 +1,7 @@
 package kim.kilho.ga.test;
 
+import java.util.Arrays;
+
 /**
  * Created by kilho on 15. 5. 13.
  */
@@ -8,8 +10,8 @@ public class CLK extends CTSPLocalOpt {
   public static final double EPS = 1e-8;  // FIXME
   public static final int LK_DEPTH = 40;
 
-  public double[][] dist;  // FIXME
-  public int[] nni;
+  // public double[][] dist;  // FIXME
+  // public int[] nni;
   private C2EdgeTour tour;
   private int _i;   // Current level
   private int _k;   // Level to obtain $G^*$
@@ -36,6 +38,10 @@ public class CLK extends CTSPLocalOpt {
     t = new int[_n*2+2];
     _t3_cand_list = new LK_T3_CAND[_nnn];
     _t5_cand_list = new LK_T5_CAND[_nnn];
+    for (int i = 0; i < _nnn; i++) {
+      _t3_cand_list[i] = new LK_T3_CAND();
+      _t5_cand_list[i] = new LK_T5_CAND();
+    }
 
     // NOTE: ADDED::
     this.TSP_FILE = tsp_file;
@@ -77,7 +83,7 @@ public class CLK extends CTSPLocalOpt {
 
     // Get t2 candidate list
     t2_cand_list = this.tour.getNeighbor(t[1]);
-    if (dist[t1][t2_cand_list[0]] - EPS <= dist[t1][t2_cand_list[1]]) {
+    if (TSP_FILE.dist(t1, t2_cand_list[0]) - EPS <= TSP_FILE.dist(t1, t2_cand_list[1])) {
       j3 = t2_cand_list[0]; t2_cand_list[0] = t2_cand_list[1]; t2_cand_list[1] = j3;
     }
 
@@ -193,7 +199,7 @@ public class CLK extends CTSPLocalOpt {
     do {
       // Get t[2i+1], t[2i+2]
       ci = _i*2;  ct = t[ci];
-      Gix = _G[_i-1] + dist[t[ci-1]][ct];
+      Gix = _G[_i-1] + TSP_FILE.dist(t[ci-1], ct);
 
       best_nt = Integer.MIN_VALUE;
       best_nnt = Integer.MIN_VALUE;  // ADDED

@@ -12,7 +12,6 @@ public class C2EdgeTour {
   // TODO: Clearly define variables below:
   private int edge_start;
   private int edge_v1;
-  // FIXME: Are these e1 and e2 locus-based form?
   // city i --> city j : city i & j are connected.
   // If j<0, city i is not connected to city j in #e1#
   public int[] e1;

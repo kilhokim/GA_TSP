@@ -1,12 +1,14 @@
 package kim.kilho.ga.test;
 
+import java.util.Arrays;
+
 /**
  * Created by kilho on 15. 5. 13.
  */
 public class CSegmentTree {
   private static int LK_DEPTH = 40;   // FIXME
   private C2EdgeTour _tour;
-  private int _n;   // The number of cities in the path
+  private int _n;   // The number of cities in the tour
   private SEGMENT[] _seg_tree;
   private int _seg_size;  // The number of nodes in segment tree
   private int[] _city_order;   // city# --> order array
@@ -28,6 +30,12 @@ public class CSegmentTree {
     _n = size;
     _city_order = new int[_n];
     _time_stamp = new int[_n];
+    _seg_tree = new SEGMENT[(LK_DEPTH+2)*2];
+    for (int i = 0; i < _seg_tree.length; i++)
+      _seg_tree[i] = new SEGMENT();
+    _loc = new SEGMENT[_n];
+    for (int i = 0; i < _loc.length; i++)
+      _loc[i] = new SEGMENT();
 
     _current_time = 1;  // Initial time stamping
     for (int i = 0; i < _n; i++)
@@ -41,11 +49,11 @@ public class CSegmentTree {
      */
   }
 
-  public void setupCityOrder(C2EdgeTour path) {
-    // assert(path && path.isTour());
+  public void setupCityOrder(C2EdgeTour tour) {
+    // assert(tour && tour.isTour());
     int city, order;
 
-    _tour = path;
+    _tour = tour;
     _tour.findFirst(0);
     order = 0;
     while ((city = _tour.findNext()) >= 0)
@@ -88,17 +96,27 @@ public class CSegmentTree {
 
   private SEGMENT findSegment(int city) {
     int order;
+    boolean pointIndicator = true;
     SEGMENT seg = null;
     // assert(city >= 0 && city < _n);
+    System.out.println("city=" + city);
+    // System.out.println("_loc=" + Arrays.toString(_loc));
+    // System.out.println("_seg_tree=" + Arrays.toString(_seg_tree));
 
     // Determine proper root to traverse the tree down.
-    if (_time_stamp[city] == _current_time)
+    if (_time_stamp[city] == _current_time) {
       seg = _loc[city];
-    else
+      pointIndicator = true;
+    } else {
       seg = _seg_tree[0];   // _seg_tree[0] is always real root of the tree
+      pointIndicator = false;
+    }
+
+    System.out.println("seg.first=" + seg.first + ", seg.last=" + seg.last);
 
     // Traverse down
     order = _city_order[city];
+    System.out.println("order=" + order);
     while (true) {
       if (seg.first <= order && order <= seg.last) {
         if (_time_stamp[city] != _current_time) {
@@ -113,6 +131,12 @@ public class CSegmentTree {
         seg = seg.right_child;
       }
     }
+
+    if (pointIndicator)
+      _loc[city] = seg;
+    else
+      _seg_tree[0] = seg;
+
     // assert(seg != null);
     return seg;
   }
@@ -158,7 +182,7 @@ public class CSegmentTree {
       new1.left_child = seg.left_child;
       new1.right_child = new2;
       new2.left_child = null;
-      new2.right_child = seg.right_child;;
+      new2.right_child = seg.right_child;
     } else {
       new2 = s1; new1 = _seg_tree[_seg_size];
       new1.left_child = seg.left_child;
@@ -264,6 +288,8 @@ public class CSegmentTree {
     // assert(t4 == getPrev(t3));
     SEGMENT s1, s2, s3, s4;
 
+    System.out.println("t1=" + t1 + ", t2=" + t2);
+    System.out.println("t3=" + t3 + ", t4=" + t4);
     splitSegment(t1, t2);  splitSegment(t3, t4);
     s2 = findSegment(t2);  s4 = findSegment(t4);
     // assert(s1 = findSegment(t1));
@@ -398,7 +424,7 @@ public class CSegmentTree {
       se = findSegment(end);
     }
 
-    // if ss == se, direction of path is important.
+    // if ss == se, direction of tour is important.
     if (ss == sm && ss == se) {
       // in this situation, we process 6 cases.
       if (starto < mido && mido < endo) res = true;

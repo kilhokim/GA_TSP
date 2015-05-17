@@ -16,7 +16,7 @@ public class Test {
     int n;
 
     TSP_FILE = new TSPLIB_IO();
-    TSP_FILE.readTspFile("cycle.in");
+    TSP_FILE.readTspFile(args[0]);
     TSP_FILE.constructNN(20, false);
 
     lk = new CLK(TSP_FILE.gNumCity, TSP_FILE.gNumNN, TSP_FILE);
