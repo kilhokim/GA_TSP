@@ -30,7 +30,10 @@ public class Test {
     double tourcost = tour.evaluate();
     optPath = tour.convertToOrder(optPath, n);
 
-    System.out.println(Arrays.toString(optPath));
+    for (int i = 0; i < optPath.length; i++) {
+      System.out.print((optPath[i]+1) + " ");
+    }
+    System.out.println("");
     System.out.println("tourcost: " + tourcost);
   }
 

@@ -181,7 +181,7 @@ public class CLK extends CTSPLocalOpt {
     } // end of t2
     if (_Gstar > EPS) {
       System.out.println(String.format("t1=%d, j1=%d, j2=%d, alt j3=%d,", t1, j1, j2, j3));
-      System.out.println(String.format(" i=%d,  k=%d, Gs=%d", _i, _k, _Gstar));
+      System.out.println(String.format(" i=%d,  k=%d, Gs=%f", _i, _k, _Gstar));
       reverse_change_to_best(improved);
     } else {
       System.out.println("all backtracking failed - t1=" + t1);
@@ -523,10 +523,12 @@ public class CLK extends CTSPLocalOpt {
   }
 
   private void make_two_change(int improved) {
+    System.out.println("*Entering make_two_change()");
     // Now, we know t[1] ~ t[2*i]. We know G[0] ~ G[i-2].
     int ci = (_i-1)*2;
 
     // Segment tree
+    System.out.println("t=" + Arrays.toString(t));
     segTree.do2Change(t[1], t[ci], t[ci+1], t[ci+2]);
 
     // C2EdgeTour
@@ -534,6 +536,7 @@ public class CLK extends CTSPLocalOpt {
 
     _G[_i-1] = _G[_i-2] + TSP_FILE.dist(t[ci-1], t[ci]) - TSP_FILE.dist(t[ci], t[ci+1]);
     check_and_update(improved);
+    System.out.println("*Quitting make_two_change()");
   }
 
   private void make_three_change(int improved) {
