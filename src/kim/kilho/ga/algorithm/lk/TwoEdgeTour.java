@@ -1,117 +1,52 @@
-package kim.kilho.ga.test;
+package kim.kilho.ga.algorithm.lk;
 
 import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Created by kilho on 15. 5. 13.
+ * Parent class for tour used in TSP.
  */
-public class C2EdgeTour {
-  private static TSPLIB_IO TSP_FILE;
-  private int length;  // the total length of tour sequence
-  private double distance; // total distance for the tour
-  // TODO: Clearly define variables below:
+public class TwoEdgeTour extends Tour {
   private int edge_start;
   private int edge_v1;
   // city i --> city j : city i & j are connected.
-  // If j<0, city i is not connected to city j in #e1#
+  // If j<0, city i is not connected to city j in e1
   public int[] e1;
   // city i --> city k : city i & k are connected.
-  // If k<0, city i is not connected to city k in #e2#
+  // If k<0, city i is not connected to city k in e2
   public int[] e2;
-  // Internal variables used by findFirst() and findNext()
+  // Internal variables used in findFirst() and findNext()
   private int end, prev, cur;
   // The flag that indicates the usage of multi graph
   private boolean isMult;
 
 
-  public C2EdgeTour() {
-    distance = -1;
-    length = 0;
+  /**
+   * Default constructor.
+   */
+  public TwoEdgeTour() {
+    super();
     e1 = null;
     e2 = null;
   }
 
-  public C2EdgeTour(int length, TSPLIB_IO tsp_file) {
+  public TwoEdgeTour(TSPLib_IO tsp_file) {
+    super(tsp_file);
+    e1 = null;
+    e2 = null;
+  }
+
+  /**
+   * Constructor.
+   * @param length
+   * @param tsp_file
+   */
+  public TwoEdgeTour(int length, TSPLib_IO tsp_file) {
     create(length);
-    // NOTE: ADDED::
     TSP_FILE = tsp_file;
     System.out.println("e1=" + Arrays.toString(e1));
     System.out.println("e2=" + Arrays.toString(e2));
   }
-
-  public int getLength() {
-    return length;
-  }
-
-  public int getHammingDist(C2EdgeTour tour) {
-    int count;
-    int[] vs;
-
-    enumEdgeFirst(0);
-    count = 0;
-    while ((vs = enumEdgeNext()) != null)
-      if (tour.isThereEdge(vs[0], vs[1])) count++;
-    // assert(getLength() - count >= 0);
-    return (getLength() - count);
-  }
-
-  public double evaluate() {
-    int[] vs;
-
-    distance = 0;
-    enumEdgeFirst(0);
-    while ((vs = enumEdgeNext()) != null)
-      distance += TSP_FILE.dist(vs[0], vs[1]);
-    return distance;
-  }
-
-  public void enumEdgeFirst(int start) {
-    findFirst(start);
-    edge_start = findNext();
-    edge_v1 = findNext();
-  }
-
-  public int[] enumEdgeNext() {
-    int v1, v2;
-    if (edge_start < 0) return null;
-    v1 = edge_v1;
-    edge_v1 = findNext();
-    v2 = edge_v1;
-    if (edge_v1 < 0) {
-      v2 = edge_start;
-      edge_start = -1;
-    }
-    // assert(isThereEdge(new_v1, new_v2));
-    int[] new_vs = {v1, v2};
-    return new_vs;
-  }
-
-  public int[] convertToOrder(int[] dest, int size) {
-    // assert(size >= gNumCity);
-    int city, order;
-    findFirst(0);
-    order = 0;
-    while ((city = findNext()) >= 0)
-      dest[order++] = city;
-
-    return dest;
-  }
-
-  public int[] makeRandomOrderTour(int[] dest, int length) {
-    int i, j, k, tmp;
-    Random rand = new Random();
-    for (i = 0; i < length; i++)
-      dest[i] = i;
-    for (i = 0; i < length/2; i++) {
-      j = rand.nextInt(length);
-      k = rand.nextInt(length);
-      tmp = dest[j]; dest[j] = dest[k]; dest[k] = tmp;
-    }
-
-    return dest;
-  }
-
 
   public void create(int length) {
     this.length = length;
@@ -123,7 +58,6 @@ public class C2EdgeTour {
       e2[i] = -1;
     }
   }
-
 
   public void makeRandomTour() {
     int[] order_array = new int[length];
@@ -144,7 +78,6 @@ public class C2EdgeTour {
     cur = start;
   }
 
-  // TODO: Understand what this method does
   public int findNext() {
     if (cur < 0) return -1;
     int temp = cur;
@@ -176,7 +109,6 @@ public class C2EdgeTour {
   }
 
   public void deleteEdge(int v1, int v2) {
-    int[] t;
     // assert(isThereEdge(v1, v2));
     // assert(v1 != v2);
     // Delete v2 in v1 side
@@ -243,7 +175,6 @@ public class C2EdgeTour {
     addEdge(t4, t5);    addEdge(t6, t7);
   }
 
-  // TODO: Understand what this method does
   public boolean isBetween(int prev, int cur, int city, int end) {
     if (city == cur || city == end) return true;
     int next;
@@ -268,7 +199,7 @@ public class C2EdgeTour {
     // assert(isTour());
   }
 
-  public C2EdgeTour constructTabuEdge(C2EdgeTour tabu) {
+  public TwoEdgeTour constructTabuEdge(TwoEdgeTour tabu) {
     int ep;
     tabu.deleteAllEdge();
     for (int i = 0; i < length; i++) {
@@ -279,7 +210,7 @@ public class C2EdgeTour {
     return tabu;
   }
 
-  public boolean canAddEdge(C2EdgeTour tabu, int v1, int v2) {
+  public boolean canAddEdge(TwoEdgeTour tabu, int v1, int v2) {
     if (tabu.isThereEdge(v1, v2) || isThereEdge(v1, v2) ||
             getEdgeSize(v1) == 2 || getEdgeSize(v2) == 2)
       return false;
@@ -287,7 +218,7 @@ public class C2EdgeTour {
       return true;
   }
 
-  public C2EdgeTour addEdgeWithTabu(C2EdgeTour tabu, int v1, int v2) {
+  public TwoEdgeTour addEdgeWithTabu(TwoEdgeTour tabu, int v1, int v2) {
     // assert(tabu.getEdgeSize(v1) < 2 && tabu.getEdgeSize(v2) < 2);
     int ep1, ep2;
     int[] ns;
@@ -308,8 +239,7 @@ public class C2EdgeTour {
     return tabu;
   }
 
-  // TODO: Understand what this method does
-  public C2EdgeTour connectRandom(C2EdgeTour tabu) {
+  public TwoEdgeTour connectRandom(TwoEdgeTour tabu) {
     int i, j, k, nv, len, rne, tmp;
     int[] av;
     Random rand = new Random();

@@ -1,14 +1,14 @@
-package kim.kilho.ga.test;
+package kim.kilho.ga.algorithm.lk;
 
 import java.util.Arrays;
 
 /**
  * Created by kilho on 15. 5. 13.
  */
-public class CSegmentTree {
+public class SegmentTree {
   private static int LK_DEPTH = 40;   // FIXME
 
-  private C2EdgeTour _tour;
+  private TwoEdgeTour _tour;
   private int _n;   // The number of cities in the tour
   private SEGMENT[] _seg_tree;
   private int _seg_size;  // The number of nodes in segment tree
@@ -39,7 +39,7 @@ public class CSegmentTree {
     }
   }
 
-  public CSegmentTree(int size) {
+  public SegmentTree(int size) {
     _n = size;
     _city_order = new int[_n];
     _time_stamp = new int[_n];
@@ -69,7 +69,7 @@ public class CSegmentTree {
     for (int i = 0; i < _n; i++) _time_stamp[i] = 0;
   }
 
-  public void setupCityOrder(C2EdgeTour tour) {
+  public void setupCityOrder(TwoEdgeTour tour) {
     // assert(tour && tour.isTour());
     int city, order;
 

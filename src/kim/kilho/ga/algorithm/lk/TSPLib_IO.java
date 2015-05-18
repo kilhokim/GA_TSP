@@ -1,4 +1,4 @@
-package kim.kilho.ga.test;
+package kim.kilho.ga.algorithm.lk;
 
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 /**
  * Created by kilho on 15. 5. 13.
  */
-public class TSPLIB_IO {
+public class TSPLib_IO {
   public static final double EPS = 1e-9;
   public static int MAX_COORD_SYSTEM = 20;
   public static int GRAPH_INFO_SIZE;  // TODO: Figure out what this is
@@ -57,7 +57,7 @@ public class TSPLIB_IO {
     String szDisplayDataType;
   }
 
-  public TSPLIB_IO() {
+  public TSPLib_IO() {
     // gNodeCoords = new POINT[n];
     gtfi = new TSP_FILE_INFO();
   }

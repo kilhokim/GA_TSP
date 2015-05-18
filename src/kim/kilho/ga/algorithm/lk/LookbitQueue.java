@@ -1,24 +1,24 @@
-package kim.kilho.ga.test;
+package kim.kilho.ga.algorithm.lk;
 
 import java.util.Arrays;
 
 /**
  * Created by kilho on 15. 5. 13.
  */
-public class CLookbitQueue {
+public class LookbitQueue {
   private int[] look_bit_queue;   // Lookbit queue
   private int length;   // Size of lookbit queue
   private int look_head;   // The head part of lookbit queue
   private int look_tail;   // The tail part of lookbit queue
 
-  public CLookbitQueue(int length) {
+  public LookbitQueue(int length) {
     // assert(size > 0);
     look_bit_queue = new int[length];
     this.length = length;
   }
 
   // Construct an initial lookbit queue from c1 & c2
-  public void construct(C2EdgeTour tour, C2EdgeTour c1, C2EdgeTour c2) {
+  public void construct(TwoEdgeTour tour, TwoEdgeTour c1, TwoEdgeTour c2) {
     // assert(tour.getLength() == this.length);
     int i, t;
     int[] ns;

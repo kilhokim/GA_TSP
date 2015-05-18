@@ -1,26 +1,28 @@
 package kim.kilho.ga.test;
 
 
-import java.util.Arrays;
+import kim.kilho.ga.algorithm.lk.LK;
+import kim.kilho.ga.algorithm.lk.TSPLib_IO;
+import kim.kilho.ga.algorithm.lk.TwoEdgeTour;
 
 /**
  * Test class, only for test-purpose
  */
 public class Test {
-  public static TSPLIB_IO TSP_FILE;
+  public static TSPLib_IO TSP_FILE;
 
   public static void main(String[] args) {
-    CLK lk;
-    C2EdgeTour tour;
+    LK lk;
+    TwoEdgeTour tour;
     int[] optPath;
     int n;
 
-    TSP_FILE = new TSPLIB_IO();
+    TSP_FILE = new TSPLib_IO();
     TSP_FILE.readTspFile(args[0]);
     TSP_FILE.constructNN(20, false);
 
-    lk = new CLK(TSP_FILE.gNumCity, TSP_FILE.gNumNN, TSP_FILE);
-    tour = new C2EdgeTour(TSP_FILE.gNumCity, TSP_FILE);
+    lk = new LK(TSP_FILE.gNumCity, TSP_FILE.gNumNN, TSP_FILE);
+    tour = new TwoEdgeTour(TSP_FILE.gNumCity, TSP_FILE);
 
     n = TSP_FILE.gNumCity;
 

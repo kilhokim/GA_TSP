@@ -1,18 +1,16 @@
-package kim.kilho.ga.test;
+package kim.kilho.ga.algorithm.lk;
 
 import java.util.Arrays;
 
 /**
  * Created by kilho on 15. 5. 13.
  */
-public class CLK extends CTSPLocalOpt {
-  private static TSPLIB_IO TSP_FILE;
+public class LK extends TSPLocalOpt {
+  private static TSPLib_IO TSP_FILE;
   public static final double EPS = 1e-8;  // FIXME
   public static final int LK_DEPTH = 40;
 
-  // public double[][] dist;  // FIXME
-  // public int[] nni;
-  private C2EdgeTour tour;
+  private TwoEdgeTour tour;
   private int _i;   // Current level
   private int _k;   // Level to obtain $G^*$
   private double[] _G;  // Gain up to current level
@@ -29,9 +27,9 @@ public class CLK extends CTSPLocalOpt {
   class LK_T5_CAND { int t5; int t6; int alter_t6;
     int t7; int t8; int code; double gain; }
 
-  public CLK(int num_city, int num_nn, TSPLIB_IO tsp_file) {
+  public LK(int num_city, int num_nn, TSPLib_IO tsp_file) {
     super(num_city, num_nn);
-    System.out.println("Entering CLK()");
+    System.out.println("Entering LK()");
     _n = num_city;
     _nnn = num_nn;
     _G = new double[_n+1];
@@ -45,13 +43,13 @@ public class CLK extends CTSPLocalOpt {
 
     // NOTE: ADDED::
     this.TSP_FILE = tsp_file;
-    System.out.println("Quitting CLK()");
+    System.out.println("Quitting LK()");
   }
 
   @Override
-  public void run(C2EdgeTour tour, C2EdgeTour p1, C2EdgeTour p2,
-                  C2EdgeTour best, C2EdgeTour worst, C2EdgeTour other) {
-    System.out.println("Entering CLK::run()");
+  public void run(TwoEdgeTour tour, TwoEdgeTour p1, TwoEdgeTour p2,
+                  TwoEdgeTour best, TwoEdgeTour worst, TwoEdgeTour other) {
+    System.out.println("Entering LK::run()");
     int t1, improved;
 
     lookbitQueue.construct(tour, p1, p2);
@@ -70,7 +68,7 @@ public class CLK extends CTSPLocalOpt {
       } else
         improved = 0;
     }
-    System.out.println("Quitting CLK::run()");
+    System.out.println("Quitting LK::run()");
   }
 
   private double do_lk_search(int t1, int improved) {
@@ -531,7 +529,7 @@ public class CLK extends CTSPLocalOpt {
     System.out.println("t=" + Arrays.toString(t));
     segTree.do2Change(t[1], t[ci], t[ci+1], t[ci+2]);
 
-    // C2EdgeTour
+    // TwoEdgeTour
     tour.make2Change(t[1], t[ci], t[ci+1], t[ci+2]);
 
     _G[_i-1] = _G[_i-2] + TSP_FILE.dist(t[ci-1], t[ci]) - TSP_FILE.dist(t[ci], t[ci+1]);
@@ -545,7 +543,7 @@ public class CLK extends CTSPLocalOpt {
     // Segment tree
     segTree.do3Change(t[1], t[2], t[3], t[4], t[5], t[6]);
 
-    // C2EdgeTour
+    // TwoEdgeTour
     tour.make3Change(t[1], t[2], t[3], t[4], t[5], t[6]);
 
     _G[1] = TSP_FILE.dist(t[1], t[2]) - TSP_FILE.dist(t[2], t[3]);
@@ -560,7 +558,7 @@ public class CLK extends CTSPLocalOpt {
     // Segment tree
     segTree.do4Change(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8]);
 
-    // C2EdgeTour
+    // TwoEdgeTour
     tour.make4Change(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8]);
 
     _G[1] = TSP_FILE.dist(t[1], t[2]) - TSP_FILE.dist(t[2], t[3]);
