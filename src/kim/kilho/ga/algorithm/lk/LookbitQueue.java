@@ -3,7 +3,9 @@ package kim.kilho.ga.algorithm.lk;
 import java.util.Arrays;
 
 /**
- * Created by kilho on 15. 5. 13.
+ * Look bit queue class.
+ * @author Kilho Kim
+ * @reference C++ code of Genetics Algorithm class, Prof. Moon, Seoul National University, 2015
  */
 public class LookbitQueue {
   private int[] look_bit_queue;   // Lookbit queue

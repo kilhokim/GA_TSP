@@ -218,9 +218,9 @@ public class LK extends TSPLocalOpt {
       best_gain = -1e100;
       for (i = 0; i < _nnn; i++) {
         // 1. Get a next t candidate of current t.
-        nt = TSP_FILE.nni(ct, i);   // FIXME: Refers TSP_FILE
+        nt = TSP_FILE.nni(ct, i);
 
-        // 2. Check if yi(ct, nt) is valid.
+        // 2. Check if y(ct, nt) is valid.
         //    yi must be <not in T> and <not in {x1, x2, ..., xi-1}>.
         if (tour.isThereEdge(ct, nt)) continue;
 
@@ -273,7 +273,7 @@ public class LK extends TSPLocalOpt {
       tour.make2Change(t[1], t[i*2+2], t[i*2+1], t[i*2]);
     }
 
-    for (i = _k*2; i > 0; i--)  // set look-biut
+    for (i = _k*2; i > 0; i--)  // set look-bit
       lookbitQueue.addLookbit(t[i]);
   }
 
@@ -287,7 +287,7 @@ public class LK extends TSPLocalOpt {
 
   // Get (t3, t4) candidates
   private void get_t3_cand_list() {
-    int i, j, t3, t4, alter_t4;
+    int i, t3, t4, alter_t4;
     double x1_d;
 
     // assert(_i == 1);
@@ -322,7 +322,7 @@ public class LK extends TSPLocalOpt {
 
   // Get (t5, t6) candidates
   private void get_t5_cand_list() {
-    int i, j, t5, t6;
+    int i, t5, t6;
     double Gix;
 
     // assert(_i == 2);
@@ -358,6 +358,7 @@ public class LK extends TSPLocalOpt {
     _t5_cand_list = sort(_t5_cand_list, _num_t5_cand_list);
   }
 
+  // Get (t5, t6) candidates when t4 is the abnormal point.
   private void get_alter_t5_cand_list() {
     int i, j, t5, tmp;
     int[] t6s, t8s;
@@ -397,7 +398,7 @@ public class LK extends TSPLocalOpt {
         tmp = t6s[0];  t6s[0] = t6s[1];  t6s[1] = tmp;
       }
 
-      // 6. If t6 is between t2 and t3
+      // 6. If t5 is between t2 and t3
       if (segTree.isBetween(t[2], t5, t[3])) {
         _t5_cand_list[_num_t5_cand_list].code = 1;
 
@@ -535,12 +536,12 @@ public class LK extends TSPLocalOpt {
   }
 
   private void make_two_change(int improved) {
-    System.out.println("*Entering make_two_change()");
+    // System.out.println("*Entering make_two_change()");
     // Now, we know t[1] ~ t[2*i]. We know G[0] ~ G[i-2].
     int ci = (_i-1)*2;
 
     // Segment tree
-    System.out.println("t=" + Arrays.toString(t));
+    // System.out.println("t=" + Arrays.toString(t));
     segTree.do2Change(t[1], t[ci], t[ci+1], t[ci+2]);
 
     // TwoEdgeTour
@@ -548,7 +549,7 @@ public class LK extends TSPLocalOpt {
 
     _G[_i-1] = _G[_i-2] + TSP_FILE.dist(t[ci-1], t[ci]) - TSP_FILE.dist(t[ci], t[ci+1]);
     check_and_update(improved);
-    System.out.println("*Quitting make_two_change()");
+    // System.out.println("*Quitting make_two_change()");
   }
 
   private void make_three_change(int improved) {

@@ -12,8 +12,9 @@ import java.util.Arrays;
  */
 public class TSPLib_IO {
   public static final double EPS = 1e-9;
+  public static final int MAXN = 1500;
   public static int MAX_COORD_SYSTEM = 20;
-  public static int GRAPH_INFO_SIZE;  // TODO: Figure out what this is
+  public static int GRAPH_INFO_SIZE;
 
   // Indicator that the given problem is whether symmetric TSP or not
   public static final int TYPE_STSP = 0;   // symmetric TSP
@@ -32,7 +33,7 @@ public class TSPLib_IO {
   static String gGraphName;   // Graph name (without file extension)
   int gOptimumCost;  // Optimum tour cost or lower bound if not, 0
   int[] gOrgInfo;    // idx: remapped city's id
-  // value: original city's id
+                     // value: original city's id
 
   class POINT {
     double[] pt = new double[2];
@@ -68,11 +69,11 @@ public class TSPLib_IO {
     FileManager fm = new FileManager();
     try {
       System.out.println("Entering readTspFile()");
-      Object[] input = fm.read(graphName, 600);
+      Object[] input = fm.read(graphName, MAXN);
       Point[] points = (Point[])input[0];
       System.out.println("points.length=" + points.length);
       gtfi.nDimension = points.length;
-      // gtfi.nDimension++;   // TODO: Why?
+      // gtfi.nDimension++;   // FIXME
       gNumCity = gtfi.nDimension;
 
       // readDataInNodeCoord():
@@ -86,8 +87,6 @@ public class TSPLib_IO {
         currPoint.pt[0] = points[i].getX();
         currPoint.pt[1] = points[i].getY();
         gNodeCoords[i] = currPoint;
-        // gNodeCoords[i].pt[0] = points[i].getX();
-        // gNodeCoords[i].pt[1] = points[i].getY();
       }
 
       gDistMat = new double[(n*(n-1))/2];
@@ -107,7 +106,10 @@ public class TSPLib_IO {
       POINT curr = gNodeCoords[i];
       System.out.println("[" + curr.pt[0] + "," + curr.pt[1] + "]");
     }
-    System.out.println("gDistMat=" + Arrays.toString(gDistMat));
+    System.out.println("gDistMat=[");
+    for (int i = 0; i < gDistMat.length; i++)
+      System.out.print(gDistMat[i] + " ");
+    System.out.println("]");
   }
 
   public double getEuc2DDist(int c1, int c2) {
@@ -182,7 +184,7 @@ public class TSPLib_IO {
     for (int j = 0; j < gtfi.nCoordDim; j++)
       pt[j] = gNodeCoords[city].pt[j];
 
-    return -1;
+    return gtfi.nCoordDim;
   }
 
   // TODO: Print the tour sequence to file
