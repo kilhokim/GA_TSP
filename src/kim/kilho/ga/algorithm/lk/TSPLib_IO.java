@@ -6,7 +6,9 @@ import kim.kilho.ga.io.file.FileManager;
 import java.util.Arrays;
 
 /**
- * Created by kilho on 15. 5. 13.
+ * Structure class for storing some TSP info.
+ * @author Kilho Kim
+ * @reference C++ code of Genetics Algorithm class, Prof. Moon, Seoul National University, 2015
  */
 public class TSPLib_IO {
   public static final double EPS = 1e-9;

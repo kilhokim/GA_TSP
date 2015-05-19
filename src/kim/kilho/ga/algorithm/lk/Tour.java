@@ -3,7 +3,9 @@ package kim.kilho.ga.algorithm.lk;
 import java.util.Random;
 
 /**
- * Created by kilho on 2015. 5. 19..
+ * Parent class for tour used in TSP.
+ * @author Kilho Kim
+ * @reference C++ code of Genetics Algorithm class, Prof. Moon, Seoul National University, 2015
  */
 public abstract class Tour {
   protected static TSPLib_IO TSP_FILE;

@@ -156,7 +156,6 @@ public class SegmentTree {
       SEGMENT seg = _seg_tree[i];
       System.out.println("seg=" + seg + ", seg.first=" + seg.first + ", seg.last=" + seg.last
                          + ", seg.left_child=" + seg.left_child + ", seg.right_child=" + seg.right_child);
-
     }
     int order;
     SEGMENT seg = null;

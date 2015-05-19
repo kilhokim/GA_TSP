@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Random;
 
 /**
- * Parent class for tour used in TSP.
+ * Tour class for STSP.
+ * @author Kilho Kim
+ * @reference C++ code of Genetics Algorithm class, Prof. Moon, Seoul National University, 2015
  */
 public class TwoEdgeTour extends Tour {
   private int edge_start;

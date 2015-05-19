@@ -3,7 +3,9 @@ package kim.kilho.ga.algorithm.lk;
 import java.util.Arrays;
 
 /**
- * Created by kilho on 15. 5. 13.
+ * The main LK algorithm.
+ * @author Kilho Kim
+ * @reference C++ code of Genetics Algorithm class, Prof. Moon, Seoul National University, 2015
  */
 public class LK extends TSPLocalOpt {
   private static TSPLib_IO TSP_FILE;
@@ -12,20 +14,20 @@ public class LK extends TSPLocalOpt {
 
   private TwoEdgeTour tour;
   private int _i;   // Current level
-  private int _k;   // Level to obtain $G^*$
+  private int _k;   // Level to obtain G*
   private double[] _G;  // Gain up to current level
   private double _Gstar;  // The highest gain up to now
-  private int[] t;  // Array t: $t_1, t_2, t_3, ... $
+  private int[] t;  // Array t: t_1, t_2, t_3, ...
   private int _n;  // The number of cities
   private int _nnn;   // The number of the nearest neighboring cities
-  private int _num_t3_cand_list;   // The number of $t_3$ candidates
-  private LK_T3_CAND[] _t3_cand_list; // The array of $t_3$ candidates
-  private int _num_t5_cand_list;   // The number of $t_5$ candidates
-  private LK_T5_CAND[] _t5_cand_list; // The array of $t_5$ candidates
+  private int _num_t3_cand_list;   // The number of t_3 candidates
+  private LK_T3_CAND[] _t3_cand_list; // The array of t_3 candidates
+  private int _num_t5_cand_list;   // The number of t_5 candidates
+  private LK_T5_CAND[] _t5_cand_list; // The array of t_5 candidates
 
   class LK_T3_CAND { int t3; int t4; int alter_t4; double gain; }
   class LK_T5_CAND { int t5; int t6; int alter_t6;
-    int t7; int t8; int code; double gain; }
+                     int t7; int t8; int code; double gain; }
 
   public LK(int num_city, int num_nn, TSPLib_IO tsp_file) {
     super(num_city, num_nn);
@@ -41,7 +43,6 @@ public class LK extends TSPLocalOpt {
       _t5_cand_list[i] = new LK_T5_CAND();
     }
 
-    // NOTE: ADDED::
     this.TSP_FILE = tsp_file;
     System.out.println("Quitting LK()");
   }
@@ -71,6 +72,13 @@ public class LK extends TSPLocalOpt {
     System.out.println("Quitting LK::run()");
   }
 
+  /**
+   * LK algorithm.
+   * do_lk_search implements step2 ~ step6 of LK paper.
+   * @param t1
+   * @param improved
+   * @return double
+   */
   private double do_lk_search(int t1, int improved) {
     int[] t2_cand_list;
     int j1 = 0, j2 = 0, j3 = 0;
@@ -95,7 +103,7 @@ public class LK extends TSPLocalOpt {
       for (j2 = 0; j2 < _num_t3_cand_list; j2++) {
         // status: 0, seg(1)
         t[3] = _t3_cand_list[j2].t3;
-        // Choose t4 to be a connected graph. normal t4
+        // Step4. Choose t4 to be a connected graph. normal t4
         t[4] = _t3_cand_list[j2].t4;
         _i = 2;
         make_two_change(improved);
@@ -126,7 +134,7 @@ public class LK extends TSPLocalOpt {
         segTree.setupTree(1, t);
         _i = 1;
 
-        // Try for disconnected graph
+        // Try Step6.b - disconnected graph
         t[4] = _t3_cand_list[j2].alter_t4;
         _i = 2;
         get_alter_t5_cand_list();
@@ -142,7 +150,8 @@ public class LK extends TSPLocalOpt {
             search_deeper(improved);  // status: 3change, seg(3)
             if (_Gstar > EPS) break;
             // reverse change to 0, seg(1)
-            this.tour.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
+            this.tour.make3Change(t[1], t[6], t[5],
+                                  t[4], t[3], t[2]);
             segTree.setupTree(1, t);
             _i = 2;
 
@@ -153,7 +162,8 @@ public class LK extends TSPLocalOpt {
               search_deeper(improved);
               if (_Gstar > EPS) break;
               // reverse change to 0, seg(1)
-              this.tour.make3Change(t[1], t[6], t[5], t[4], t[3], t[2]);
+              this.tour.make3Change(t[1], t[6], t[5],
+                                    t[4], t[3], t[2]);
               segTree.setupTree(1, t);
               _i = 2;
             }
@@ -167,7 +177,7 @@ public class LK extends TSPLocalOpt {
             if (_Gstar > EPS) break;
             // reverse change to 0, seg(1)
             this.tour.make4Change(t[1], t[8], t[7], t[6],
-                    t[5], t[4], t[3], t[2]);
+                                  t[5], t[4], t[3], t[2]);
             segTree.setupTree(1, t);
             _i = 2;
           }  // end of t6
@@ -187,6 +197,10 @@ public class LK extends TSPLocalOpt {
     return _Gstar;
   }
 
+  /**
+   * Search further. If not improved, reverse-change.
+   * @param improved
+   */
   private void search_deeper(int improved) {
     int i, j, start_i;
     int ci, ct, nt, nnt;

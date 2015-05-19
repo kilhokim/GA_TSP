@@ -1,6 +1,5 @@
 package kim.kilho.ga.test;
 
-
 import kim.kilho.ga.algorithm.lk.LK;
 import kim.kilho.ga.algorithm.lk.TSPLib_IO;
 import kim.kilho.ga.algorithm.lk.TwoEdgeTour;
