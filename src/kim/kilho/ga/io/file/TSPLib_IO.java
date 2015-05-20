@@ -1,4 +1,4 @@
-package kim.kilho.ga.algorithm.lk;
+package kim.kilho.ga.io.file;
 
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
@@ -12,7 +12,6 @@ import java.util.Arrays;
  */
 public class TSPLib_IO {
   public static final double EPS = 1e-9;
-  public static final int MAXN = 1500;
   public static int MAX_COORD_SYSTEM = 20;
   public static int GRAPH_INFO_SIZE;
 
@@ -26,6 +25,7 @@ public class TSPLib_IO {
   public static int gNumNN;  // # of nearest neighbors
   public static double[] gDistMat;   // distance matrix
   public static int[] gNNI;   // nearest neighbors arrays
+  public double timeLimit;   // Time limit for given TSP
 
   // Internal global variables
   POINT[] gNodeCoords;   // When NODE_COORD_SECTION exists, used
@@ -34,6 +34,7 @@ public class TSPLib_IO {
   int gOptimumCost;  // Optimum tour cost or lower bound if not, 0
   int[] gOrgInfo;    // idx: remapped city's id
                      // value: original city's id
+
 
   class POINT {
     double[] pt = new double[2];
@@ -65,12 +66,13 @@ public class TSPLib_IO {
     gtfi = new TSP_FILE_INFO();
   }
 
-  public void readTspFile(String graphName) {
+  public void readTspFile(String graphName, int maxn) {
     FileManager fm = new FileManager();
     try {
       System.out.println("Entering readTspFile()");
-      Object[] input = fm.read(graphName, MAXN);
+      Object[] input = fm.read(graphName, maxn);
       Point[] points = (Point[])input[0];
+      timeLimit = (Double)input[1];
       System.out.println("points.length=" + points.length);
       gtfi.nDimension = points.length;
       // gtfi.nDimension++;   // FIXME
@@ -89,6 +91,7 @@ public class TSPLib_IO {
         gNodeCoords[i] = currPoint;
       }
 
+      // Calculate gDistMat
       gDistMat = new double[(n*(n-1))/2];
       for (int r = 0; r < n-1; r++)
         for (int c = r+1; c < n; c++)

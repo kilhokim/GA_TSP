@@ -1,5 +1,7 @@
 package kim.kilho.ga.algorithm.lk;
 
+import kim.kilho.ga.io.file.TSPLib_IO;
+
 import java.util.Random;
 
 /**

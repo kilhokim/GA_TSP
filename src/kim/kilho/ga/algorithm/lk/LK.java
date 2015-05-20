@@ -1,6 +1,6 @@
 package kim.kilho.ga.algorithm.lk;
 
-import java.util.Arrays;
+import kim.kilho.ga.io.file.TSPLib_IO;
 
 /**
  * The main LK algorithm.
@@ -542,7 +542,7 @@ public class LK extends TSPLocalOpt {
 
     // Segment tree
     // System.out.println("t=" + Arrays.toString(t));
-    segTree.do2Change(t[1], t[ci], t[ci+1], t[ci+2]);
+    segTree.do2Change(t[1], t[ci], t[ci + 1], t[ci + 2]);
 
     // TwoEdgeTour
     tour.make2Change(t[1], t[ci], t[ci+1], t[ci+2]);

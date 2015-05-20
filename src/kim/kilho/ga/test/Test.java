@@ -1,7 +1,7 @@
 package kim.kilho.ga.test;
 
 import kim.kilho.ga.algorithm.lk.LK;
-import kim.kilho.ga.algorithm.lk.TSPLib_IO;
+import kim.kilho.ga.io.file.TSPLib_IO;
 import kim.kilho.ga.algorithm.lk.TwoEdgeTour;
 
 /**
@@ -9,6 +9,7 @@ import kim.kilho.ga.algorithm.lk.TwoEdgeTour;
  */
 public class Test {
   public static TSPLib_IO TSP_FILE;
+  public static int MAXN = 1500;
 
   public static void main(String[] args) {
     LK lk;
@@ -17,7 +18,7 @@ public class Test {
     int n;
 
     TSP_FILE = new TSPLib_IO();
-    TSP_FILE.readTspFile(args[0]);
+    TSP_FILE.readTspFile(args[0], MAXN);
     TSP_FILE.constructNN(20, false);
 
     lk = new LK(TSP_FILE.gNumCity, TSP_FILE.gNumNN, TSP_FILE);

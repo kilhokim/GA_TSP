@@ -1,26 +1,29 @@
 package kim.kilho.ga;
 
-import kim.kilho.ga.algorithm.*;
+import kim.kilho.ga.algorithm.Crossover;
+import kim.kilho.ga.algorithm.Mutation;
+import kim.kilho.ga.algorithm.Replacement;
+import kim.kilho.ga.algorithm.Selection;
+import kim.kilho.ga.algorithm.lk.LK;
+import kim.kilho.ga.algorithm.lk.TwoEdgeTour;
 import kim.kilho.ga.gene.Path;
 import kim.kilho.ga.gene.PathPopulation;
 import kim.kilho.ga.gene.Point;
 import kim.kilho.ga.io.file.FileManager;
+import kim.kilho.ga.io.file.TSPLib_IO;
 import kim.kilho.ga.util.PointUtils;
 
 import java.util.Random;
 
 public class Main {
 
-    public static final int MAXN = 600; // Maximum value of N
+    public static final int MAXN = 1500; // Maximum value of N
     public static final int PSIZE = 50;  // Size of the population
+
+    static TSPLib_IO TSP_FILE;
+
     // Population of solutions.
     static PathPopulation population;
-    // Total array of points.
-    static Point[] points = null;
-    // Time limit for the test case
-    static double timeLimit;
-
-    static FileManager fm;
 
     // Constants
     // Selection
@@ -71,8 +74,8 @@ public class Main {
         /*
           FIXME: Uncomment below to start a single 2-Opt
           Path p = new Path(points.length, true);
-          runTwoOpt(p, points, beginTime, timeLimit);
-         */
+          runLK(p, beginTime, TSP_FILE.timeLimit);
+        */
 
         /*
           FIXME: Uncomment below to start a Multi-start 2-Opt
@@ -81,7 +84,7 @@ public class Main {
           for (int j = 0; j < reps; j++) {
             beginTime = System.currentTimeMillis()/1000;
             Path p = new Path(points.length, true);
-            paths[j] = runTwoOpt(p, points, beginTime, timeLimit);
+            paths[j] = runLK(p, beginTime, TSP_FILE.timeLimit);
           }
          */
         // finalize(args);
@@ -93,15 +96,8 @@ public class Main {
      * @param args
      */
     private static void init(String[] args) {
-        fm = new FileManager();
-        try {
-            Object[] input = fm.read(args[0], MAXN);
-            points = (Point[])input[0];
-            timeLimit = (Double)input[1];
-            PointUtils.calculate(points);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        TSP_FILE = new TSPLib_IO();
+        TSP_FILE.readTspFile(args[0], MAXN);
     }
 
     /**
@@ -109,6 +105,7 @@ public class Main {
      * @param args
      */
     private static void finalize(String[] args) {
+      FileManager fm = new FileManager();
       try {
         fm.write(args[0], population.getRecord());
       } catch (Exception e) {
@@ -125,22 +122,22 @@ public class Main {
         Random rnd = new Random();
         int iter = 0;
 
-        population = new PathPopulation(PSIZE, points.length);
+        population = new PathPopulation(PSIZE, TSP_FILE.gNumCity);
         // Do local optimization for the paths in population
         for (int i = 0; i < PSIZE; i++) {
           System.out.println("Optimizing path #" + i + " in population...");
-          population.set(i, runTwoOpt(population.get(i), points, beginTime, timeLimit));
+          population.set(i, runLK(population.get(i), beginTime, TSP_FILE.timeLimit));
         }
-        System.exit(0);
+        // System.exit(0);
         // population.evaluateAll(points);
 
         try {
-            System.out.println("# of points: " + points.length);
-            System.out.println("time limit: " + timeLimit);
+            System.out.println("# of points: " + TSP_FILE.gNumCity);
+            System.out.println("time limit: " + TSP_FILE.timeLimit);
             System.out.println("GA Start!");
             while (true) {
               // FIXME:
-              if (System.currentTimeMillis()/1000 - beginTime >= timeLimit - 1)
+              if (System.currentTimeMillis()/1000 - beginTime >= TSP_FILE.timeLimit - 1)
                 break;    // end condition
 
               if (iter % 1 == 0) {
@@ -164,12 +161,11 @@ public class Main {
                 offspring = mutation(offspring, mutation);
 
               // 4. Do local optimization
-              if (localOpt)
-                offspring = runTwoOpt(offspring, points, beginTime, timeLimit);
-
               // 5. Evaluate the distance value of newly generated offspring
               //    and update the best record
-              offspring.evaluate(points);
+              if (localOpt)
+                offspring = runLK(offspring, beginTime, TSP_FILE.timeLimit);
+
               if (population.getRecord().getDistance() > offspring.getDistance())
                 population.setRecord(offspring);
 
@@ -183,14 +179,29 @@ public class Main {
     }
 
     /**
-     * Run 2-Opt algorithm.
+     * Run LK algorithm.
      * @param p
      * @return Path
      */
-    private static Path runTwoOpt(Path p, Point[] points,
-                                  long beginTime, double timeLimit) {
-        // System.out.println("Start 2-Opt algorithm!");
-        Path offspring = LocalSearch.twoOpt(p, points, beginTime, timeLimit);
+    private static Path runLK(Path p, long beginTime, double timeLimit) {
+        // System.out.println("Start LK algorithm!");
+        // Path offspring = LocalSearch.twoOpt(p, points, beginTime, timeLimit);
+        LK lk = new LK(TSP_FILE.gNumCity, TSP_FILE.gNumNN, TSP_FILE);
+        TwoEdgeTour offspringTour = new TwoEdgeTour(TSP_FILE.gNumCity, TSP_FILE);
+        int n = TSP_FILE.gNumCity;
+        int[] offspringPath = new int[n];
+
+        // Run LK based on current offspring path
+        offspringTour.convertFromPath(p.getPath());
+        // offspringTour.makeRandomTour();
+        lk.run(offspringTour, null, null, null, null, null);
+        double tourcost = offspringTour.evaluate();
+
+        // Convert TwoEdgeTour to Path and set distance
+        offspringPath = offspringTour.convertToOrder(offspringPath, n);
+        Path offspring = new Path(n, false);
+        offspring.setPath(offspringPath);
+        offspring.setDistance(tourcost);
         // System.out.println("path: " + offspring.toString());
         // System.out.println(offspring.getDistance());
         return offspring;

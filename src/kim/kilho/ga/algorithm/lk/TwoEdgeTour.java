@@ -1,5 +1,7 @@
 package kim.kilho.ga.algorithm.lk;
 
+import kim.kilho.ga.io.file.TSPLib_IO;
+
 import java.util.Arrays;
 import java.util.Random;
 
@@ -46,8 +48,8 @@ public class TwoEdgeTour extends Tour {
   public TwoEdgeTour(int length, TSPLib_IO tsp_file) {
     create(length);
     TSP_FILE = tsp_file;
-    System.out.println("e1=" + Arrays.toString(e1));
-    System.out.println("e2=" + Arrays.toString(e2));
+    // System.out.println("e1=" + Arrays.toString(e1));
+    // System.out.println("e2=" + Arrays.toString(e2));
   }
 
   public void create(int length) {
@@ -131,7 +133,6 @@ public class TwoEdgeTour extends Tour {
     return n/2;
   }
 
-  // TODO: Understand what this method does
   public boolean isTour() {
     for (int i = 0; i < length; i++)
       if (getEdgeSize(i) <= 1)
@@ -350,5 +351,14 @@ public class TwoEdgeTour extends Tour {
     else                                  return 0;
   }
 
+  public void convertFromPath(int[] path) {
+    // assert(path.length == this.length)
+    // assert(path.length == this.length)
+    for (int i = 0; i < length-1; i++)
+      addEdge(path[i], path[i+1]);
+    addEdge(path[0], path[length-1]);
+
+
+  }
 
 }
