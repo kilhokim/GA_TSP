@@ -69,17 +69,17 @@ public class TSPLib_IO {
   public void readTspFile(String graphName, int maxn) {
     FileManager fm = new FileManager();
     try {
-      System.out.println("Entering readTspFile()");
+      // System.out.println("Entering readTspFile()");
       Object[] input = fm.read(graphName, maxn);
       Point[] points = (Point[])input[0];
       timeLimit = (Double)input[1];
-      System.out.println("points.length=" + points.length);
+      // System.out.println("points.length=" + points.length);
       gtfi.nDimension = points.length;
       // gtfi.nDimension++;   // FIXME
       gNumCity = gtfi.nDimension;
 
       // readDataInNodeCoord():
-      System.out.println("Entering readDataInNodeCoord()");
+      // System.out.println("Entering readDataInNodeCoord()");
       int n = gtfi.nDimension;
 
       gNodeCoords = new POINT[n];
@@ -96,23 +96,27 @@ public class TSPLib_IO {
       for (int r = 0; r < n-1; r++)
         for (int c = r+1; c < n; c++)
           gDistMat[c*(c-1)/2 + r] = getEuc2DDist(r, c);
-      System.out.println("Quitting readDataInNodeCoord()");
+      // System.out.println("Quitting readDataInNodeCoord()");
 
       gType = TYPE_STSP;
-      System.out.println("Quitting readTspFile()");
+      // System.out.println("Quitting readTspFile()");
     } catch (Exception e) {
       e.printStackTrace();
     }
     System.out.println("gNumCity=" + gNumCity);
+    /*
     System.out.println("gNodeCoords=");
     for (int i = 0; i < gNodeCoords.length; i++) {
       POINT curr = gNodeCoords[i];
       System.out.println("[" + curr.pt[0] + "," + curr.pt[1] + "]");
     }
+    */
+    /*
     System.out.println("gDistMat=[");
     for (int i = 0; i < gDistMat.length; i++)
       System.out.print(gDistMat[i] + " ");
     System.out.println("]");
+    */
   }
 
   public double getEuc2DDist(int c1, int c2) {
@@ -240,7 +244,7 @@ public class TSPLib_IO {
   public int getOptimumCost() { return gOptimumCost; }
 
   public void constructNN(int numNN, boolean is_quadrant) {
-    System.out.println("Entering constructNN()");
+    // System.out.println("Entering constructNN()");
     gNumNN = numNN;
     if (is_quadrant &&
             (gtfi.szEdgeWeightType.equals("EUC_2D") ||
@@ -256,13 +260,13 @@ public class TSPLib_IO {
       gNNI = constructNormal(gNNI);
     }
 
-    System.out.println("gNumNN=" + gNumNN);
-    System.out.println("gNNI=" + Arrays.toString(gNNI));
-    System.out.println("Quitting constructNN()");
+    // System.out.println("gNumNN=" + gNumNN);
+    // System.out.println("gNNI=" + Arrays.toString(gNNI));
+    // System.out.println("Quitting constructNN()");
   }
 
   public int[] constructNormal(int[] NNI) {
-    System.out.println("Entering constructNormal");
+    // System.out.println("Entering constructNormal");
     int[] neighbors = new int[gNumCity-1];
     double[] ndist = new double[gNumCity-1];
 
@@ -278,7 +282,7 @@ public class TSPLib_IO {
       for (int j = 0; j < gNumNN; j++)
         NNI[i*gNumNN+j] = neighbors[j];
     }
-    System.out.println("Quitting constructNormal");
+    // System.out.println("Quitting constructNormal");
 
     return NNI;
   }
@@ -288,7 +292,7 @@ public class TSPLib_IO {
     int[][] nns = new int[4][];
     int[] size = new int[4], alloc = new int[4];
     double[][] ndist = new double[4][];
-    System.out.println("Entering constructQuadNeighbors()");
+    // System.out.println("Entering constructQuadNeighbors()");
 
     for (i = 0; i < 4; i++) {
       nns[i] = new int[gNumCity-1];
@@ -333,7 +337,7 @@ public class TSPLib_IO {
       for (j = 0; j < gNumNN; j++)
         NNI[i*gNumNN+j] = nns[0][j];
     }
-    System.out.println("Quitting constructQuadNeighbors()");
+    // System.out.println("Quitting constructQuadNeighbors()");
 
     return NNI;
   }

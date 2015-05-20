@@ -31,7 +31,7 @@ public class LK extends TSPLocalOpt {
 
   public LK(int num_city, int num_nn, TSPLib_IO tsp_file) {
     super(num_city, num_nn);
-    System.out.println("Entering LK()");
+    // System.out.println("Entering LK()");
     _n = num_city;
     _nnn = num_nn;
     _G = new double[_n+1];
@@ -44,13 +44,13 @@ public class LK extends TSPLocalOpt {
     }
 
     this.TSP_FILE = tsp_file;
-    System.out.println("Quitting LK()");
+    // System.out.println("Quitting LK()");
   }
 
   @Override
   public void run(TwoEdgeTour tour, TwoEdgeTour p1, TwoEdgeTour p2,
                   TwoEdgeTour best, TwoEdgeTour worst, TwoEdgeTour other) {
-    System.out.println("Entering LK::run()");
+    // System.out.println("Entering LK::run()");
     int t1, improved;
 
     lookbitQueue.construct(tour, p1, p2);
@@ -69,7 +69,7 @@ public class LK extends TSPLocalOpt {
       } else
         improved = 0;
     }
-    System.out.println("Quitting LK::run()");
+    // System.out.println("Quitting LK::run()");
   }
 
   /**
@@ -188,11 +188,11 @@ public class LK extends TSPLocalOpt {
       if (_Gstar > EPS) break;
     } // end of t2
     if (_Gstar > EPS) {
-      System.out.println(String.format("t1=%d, j1=%d, j2=%d, alt j3=%d,", t1, j1, j2, j3));
-      System.out.println(String.format(" i=%d,  k=%d, Gs=%f", _i, _k, _Gstar));
+      // System.out.println(String.format("t1=%d, j1=%d, j2=%d, alt j3=%d,", t1, j1, j2, j3));
+      // System.out.println(String.format(" i=%d,  k=%d, Gs=%f", _i, _k, _Gstar));
       reverse_change_to_best(improved);
     } else {
-      System.out.println("all backtracking failed - t1=" + t1);
+      // System.out.println("all backtracking failed - t1=" + t1);
     }
     return _Gstar;
   }

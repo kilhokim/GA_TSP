@@ -43,9 +43,9 @@ public class LookbitQueue {
           addLookbit(i);
       }
     }
-    System.out.println("look_bit_queue=" + Arrays.toString(look_bit_queue));
-    System.out.println("look_head=" + look_head);
-    System.out.println("look_tail=" + look_tail);
+    // System.out.println("look_bit_queue=" + Arrays.toString(look_bit_queue));
+    // System.out.println("look_head=" + look_head);
+    // System.out.println("look_tail=" + look_tail);
   }
 
   // Add a new city c into lookbit queue
