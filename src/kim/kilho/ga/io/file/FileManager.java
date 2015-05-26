@@ -107,7 +107,15 @@ public class FileManager {
     // Generate a new file writer
     // throw IOException for the following line:
     bw = new BufferedWriter(new FileWriter(outputFileName.toString()));
-    bw.write(path.toString());
+    // NOTE: Convert 0-base notation to 1-base notation.
+    int[] p = path.getPath();
+    for (int i = 0; i < p.length; i++) {
+      p[i] += 1;
+      if (i == p.length-1)
+        bw.write(p[i] + "");
+      else
+        bw.write(p[i] + " ");
+    }
     bw.close();
   }
 

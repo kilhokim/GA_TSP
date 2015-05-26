@@ -103,7 +103,7 @@ public class TSPLib_IO {
     } catch (Exception e) {
       e.printStackTrace();
     }
-    System.out.println("gNumCity=" + gNumCity);
+    // System.out.println("gNumCity=" + gNumCity);
     /*
     System.out.println("gNodeCoords=");
     for (int i = 0; i < gNodeCoords.length; i++) {

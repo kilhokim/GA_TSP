@@ -35,6 +35,11 @@ public class Main {
     // The number of local optimizations.
     static int numLKs;
 
+    // Arrays for tracking the minimum distance
+    // and average distance by generations
+    // static double[] minDist;
+    // static double[] avgDist;
+
     // Constants
     // Selection
     public static final int ROULETTE_WHEEL_SELECTION = 1;
@@ -67,42 +72,45 @@ public class Main {
     // $ java Main data/cycle.in
     public static void main(String[] args) {
       final int NUM_ITERATIONS = 1;
+      // final int NUM_ITERATIONS = 20;
       // final int NUM_ITERATIONS = 100;
 
       // int[] key = {se, xo, mt, rp};
       double[] result = new double[NUM_ITERATIONS];
+      /*
       Path[] resultPath = new Path[NUM_ITERATIONS];
       int[] resultNumLKs = new int[NUM_ITERATIONS];
       int[] resultNumGenerations = new int[NUM_ITERATIONS];
       long[] resultTimeSpent = new long[NUM_ITERATIONS];
+      */
 
 
       for (int i = 0; i < result.length; i++) {
-        System.out.println("************ iter #" + i + " ***************");
-        long beginTime = System.currentTimeMillis()/1000;
+        // System.out.println("************ iter #" + i + " ***************");
+        long beginTime = System.currentTimeMillis();
         long timeSpent;
         init(args);
         numGenerations = 0;   // Initialize numGenerations
         numLKs = 0;  // Initialize numLKs
 
-        /*
         // FIXME: Uncomment below to start hybrid GA
         GA(TOURNAMENT_SELECTION, ORDER_CROSSOVER,
            DISPLACEMENT_MUTATION, WORST_PARENT_CASE_REPLACEMENT,
            beginTime, true);
         recordPath = population.getRecord();
         record = population.getRecord().getDistance();
-        */
 
+        /*
         // FIXME: Uncomment below to start a single LK
         Path offspring = new Path(TSP_FILE.gNumCity, true);
         offspring = runLK(offspring, beginTime, TSP_FILE.timeLimit);
         recordPath = offspring;
         record = offspring.getDistance();
+        */
 
         /*
         // FIXME: Uncomment below to start a Multi-start LK
-        int reps = 10;
+        int reps = 27914;
         Path minOffspring = new Path(TSP_FILE.gNumCity, true);
         double minOffspringDist = Double.MAX_VALUE;
         int j;
@@ -113,18 +121,19 @@ public class Main {
             minOffspringDist = offspring.getDistance();
             minOffspring = offspring;
           }
-          if (System.currentTimeMillis()/1000 - beginTime >= TSP_FILE.timeLimit - 1)
-            break;    // end condition
+          // if (System.currentTimeMillis()/1000 - beginTime/1000 >= TSP_FILE.timeLimit - 1)
+          //   break;    // end condition
         }
         recordPath = minOffspring;
         record = minOffspringDist;
         */
 
+        /*
         result[i] = record;
         resultPath[i] = recordPath;
         resultNumLKs[i] = numLKs;
         resultNumGenerations[i] = numGenerations;
-        timeSpent = System.currentTimeMillis()/1000 - beginTime;
+        timeSpent = System.currentTimeMillis() - beginTime; // ms
         resultTimeSpent[i] = timeSpent;
         System.out.println("path: " + resultPath[i].toString());
         System.out.println("distance: " + result[i]);
@@ -132,11 +141,23 @@ public class Main {
         System.out.println("numGenerations: " + resultNumGenerations[i]);
         System.out.println("timeSpent: " + timeSpent);
         // System.out.println("reps: " + j);
+        */
 
+        /*
+        System.out.println("minDist per generation: ");
+        for (int j = 0; j < numGenerations; j++)
+          if (j % 100 == 0)
+            System.out.println(minDist[j]);
+        System.out.println("avgDist per generation: ");
+        for (int j = 0; j < numGenerations; j++)
+          if (j % 100 == 0)
+            System.out.println(avgDist[j]);
+        */
 
-        // finalize(args);
+        finalize(args);
       }
 
+      /*
       System.out.println("distances:");
       for (int i = 0; i < NUM_ITERATIONS; i++)
         System.out.println(result[i]);
@@ -152,6 +173,7 @@ public class Main {
       System.out.println("timeSpents:");
       for (int i = 0; i < NUM_ITERATIONS; i++)
         System.out.println(resultTimeSpent[i]);
+      */
     }
 
     /**
@@ -189,7 +211,7 @@ public class Main {
       population = new PathPopulation(PSIZE, TSP_FILE.gNumCity);
       // Do local optimization for the paths in population
         for (int i = 0; i < PSIZE; i++) {
-          System.out.println("Optimizing path #" + i + " in population...");
+          // System.out.println("Optimizing path #" + i + " in population...");
           Path p = runLK(population.get(i), beginTime, TSP_FILE.timeLimit);
           population.set(i, p);
           if (population.getRecord().getDistance() > p.getDistance())
@@ -199,18 +221,22 @@ public class Main {
         // population.evaluateAll(points);
 
         try {
-            System.out.println("# of points: " + TSP_FILE.gNumCity);
-            System.out.println("time limit: " + TSP_FILE.timeLimit);
-            System.out.println("GA Start!");
+
+            // minDist = new double[10000];
+            // avgDist = new double[10000];
+
+            // System.out.println("# of points: " + TSP_FILE.gNumCity);
+            // System.out.println("time limit: " + TSP_FILE.timeLimit);
+            // System.out.println("GA Start!");
             while (true) {
-              if (System.currentTimeMillis()/1000 - beginTime >= TSP_FILE.timeLimit - 1)
+              if (System.currentTimeMillis()/1000 - beginTime/1000 >= TSP_FILE.timeLimit - 1)
                 break;    // end condition
               numGenerations++;
 
               if (++iter % 100 == 0) {
-                System.out.println("********iter #" + iter + "**********");
-                System.out.println(population.getRecord().toString());
-                System.out.println(population.getRecord().getDistance());
+                // System.out.println("********iter #" + iter + "**********");
+                // System.out.println(population.getRecord().toString());
+                // System.out.println(population.getRecord().getDistance());
               }
 
               // 1. Select two paths p1 and p2 from the population
@@ -239,6 +265,15 @@ public class Main {
               // 5. Replace one of the path in population with the new offspring
               population = replacement(offspring, replacement, p1, p2);
 
+              // Add the minimum distance and the average distance
+              // in this generations as a new element
+              /*
+              minDist[numGenerations-1] = population.getRecord().getDistance();
+              double distanceSum = 0;
+              for (int i = 0; i < population.size(); i++)
+                distanceSum += population.get(i).getDistance();
+              avgDist[numGenerations-1] = distanceSum / population.size();
+              */
             }
         } catch (Exception e) {
             e.printStackTrace();
